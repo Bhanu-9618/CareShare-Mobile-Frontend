@@ -9,6 +9,7 @@ import AddFoodScreen from '../screens/main/AddFoodScreen';
 import VolunteerFeedScreen from '../screens/main/VolunteerFeedScreen';
 import FoodDetailScreen from '../screens/main/FoodDetailScreen';
 import OngoingTaskScreen from '../screens/main/OngoingTaskScreen';
+import VerificationScreen from '../screens/main/VerificationScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
 
 const Stack = createStackNavigator();
@@ -18,7 +19,7 @@ function MainTabs() {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen name="Available Food" component={VolunteerFeedScreen} />
-      <Tab.Screen name="My Task" component={OngoingTaskScreen} /> 
+      <Tab.Screen name="My Task" component={OngoingTaskScreen} />
       <Tab.Screen name="Home" component={DonorHomeScreen} />
       <Tab.Screen name="Post Food" component={AddFoodScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
@@ -33,6 +34,7 @@ export default function AppNavigator() {
       <Stack.Screen name="SignUp" component={SignUpScreen} />
       <Stack.Screen name="MainTabs" component={MainTabs} />
       <Stack.Screen name="FoodDetail" component={FoodDetailScreen} options={{ headerShown: true, title: 'Donation Details' }} />
+      <Stack.Screen name="Verification" component={VerificationScreen} options={{ headerShown: true, title: 'Verify Delivery' }} /> 
     </Stack.Navigator>
   );
 }
