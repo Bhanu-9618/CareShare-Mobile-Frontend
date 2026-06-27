@@ -5,7 +5,7 @@ export interface FoodItem {
   foodName: string;
   quantity: string;
   hotelName: string;
-  status: 'Active' | 'Accepted' | 'Completed';
+  status: 'Active' | 'Accepted' | 'Picked Up' | 'Completed';
   expiryTime: string;
   image?: string;
   latitude: number;
