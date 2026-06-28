@@ -18,6 +18,18 @@ export default function FoodDetailScreen({ route, navigation }: any) {
   }
 
   const handleClaimDonation = () => {
+    const ongoingTasksCount = foodList.filter(
+      (item) => item.currentVolunteerId === user?.id && item.status === 'Accepted'
+    ).length;
+
+    if (ongoingTasksCount >= 5) {
+      Alert.alert(
+        'Limit Reached',
+        'You already have 5 ongoing tasks. Please pick up and deliver them before claiming new donations.'
+      );
+      return;
+    }
+
     updateFoodStatus(foodId, 'Accepted', user?.id);
 
     Alert.alert('Success', 'You have successfully claimed this donation!', [

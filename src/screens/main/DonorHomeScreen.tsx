@@ -28,6 +28,9 @@ export default function DonorHomeScreen() {
         <Text style={styles.hotelName}>{item.hotelName}</Text>
         <Text style={styles.addressText}>{item.address}</Text>
         <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
+        {item.currentVolunteerId && (
+          <Text style={styles.volunteerText}>Accepted by: {item.currentVolunteerId}</Text>
+        )}
         <View style={styles.expiryRow}>
           <Text style={styles.expiry}>Expires: {item.expiryTime}</Text>
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
@@ -143,6 +146,12 @@ const styles = StyleSheet.create({
   quantity: {
     fontSize: 13,
     color: '#666666',
+    marginBottom: 4,
+  },
+  volunteerText: {
+    fontSize: 12,
+    color: '#0056b3',
+    fontWeight: '500',
     marginBottom: 8,
   },
   addressText: {

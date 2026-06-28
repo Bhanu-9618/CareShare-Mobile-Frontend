@@ -6,11 +6,11 @@ import CustomButton from '../../components/CustomButton';
 export default function OngoingTaskScreen({ navigation }: any) {
   const { user, foodList, updateFoodStatus } = useApp();
 
-  const activeTask = foodList.find(
+  const activeTasks = foodList.filter(
     (item) => item.currentVolunteerId === user?.id && item.status === 'Accepted'
   );
 
-  if (!activeTask) {
+  if (activeTasks.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>No ongoing tasks at the moment.</Text>
@@ -19,61 +19,63 @@ export default function OngoingTaskScreen({ navigation }: any) {
     );
   }
 
-  const handleNextStep = () => {
-    if (activeTask.status === 'Accepted') {
-      updateFoodStatus(activeTask.id, 'Live', user?.id);
-      Alert.alert('Status Updated', 'Food item marked as Picked Up from the hotel!');
-    }
+  const handleNextStep = (taskId: string) => {
+    updateFoodStatus(taskId, 'Live', user?.id);
+    Alert.alert('Status Updated', 'Food item marked as Picked Up from the hotel!');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Ongoing Delivery Task</Text>
-      <Text style={styles.subtitle}>Track your progress and update the status.</Text>
+      <Text style={styles.title}>Ongoing Delivery Tasks</Text>
+      <Text style={styles.subtitle}>Track your progress ({activeTasks.length}/5).</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.foodName}>{activeTask.foodName}</Text>
-        <Text style={styles.quantity}>Quantity: {activeTask.quantity}</Text>
-        <Text style={styles.hotelName}>From: {activeTask.hotelName}</Text>
-        <Text style={styles.addressText}>Address: {activeTask.address}</Text>
-        <Text style={styles.addressText}>To: Community Center - Colombo 03</Text>
-      </View>
+      {activeTasks.map((activeTask) => (
+        <View key={activeTask.id} style={styles.taskWrapper}>
+          <View style={styles.card}>
+            <Text style={styles.foodName}>{activeTask.foodName}</Text>
+            <Text style={styles.quantity}>Quantity: {activeTask.quantity}</Text>
+            <Text style={styles.hotelName}>From: {activeTask.hotelName}</Text>
+            <Text style={styles.addressText}>Address: {activeTask.address}</Text>
+            <Text style={styles.addressText}>To: Community Center - Colombo 03</Text>
+          </View>
 
-      <View style={styles.timelineContainer}>
-        <Text style={styles.sectionTitle}>Delivery Progress</Text>
+          <View style={styles.timelineContainer}>
+            <Text style={styles.sectionTitle}>Delivery Progress</Text>
 
-        <View style={styles.timelineRow}>
-          <View style={[styles.circle, styles.completedCircle]} />
-          <Text style={[styles.timelineText, styles.completedText]}>Donation Claimed</Text>
+            <View style={styles.timelineRow}>
+              <View style={[styles.circle, styles.completedCircle]} />
+              <Text style={[styles.timelineText, styles.completedText]}>Donation Claimed</Text>
+            </View>
+            <View style={styles.line} />
+
+            <View style={styles.timelineRow}>
+              <View
+                style={[
+                  styles.circle,
+                  activeTask.status === 'Picked Up' ? styles.completedCircle : styles.pendingCircle,
+                ]}
+              />
+              <Text
+                style={[
+                  styles.timelineText,
+                  activeTask.status === 'Picked Up' ? styles.completedText : styles.pendingText,
+                ]}
+              >
+                Picked Up From Hotel
+              </Text>
+            </View>
+          </View>
+
+          <View style={{ marginTop: 20 }} />
+
+          {activeTask.status === 'Accepted' && (
+            <CustomButton
+              title="Picked Up From Hotel"
+              onPress={() => handleNextStep(activeTask.id)}
+            />
+          )}
         </View>
-        <View style={styles.line} />
-
-        <View style={styles.timelineRow}>
-          <View
-            style={[
-              styles.circle,
-              activeTask.status === 'Picked Up' ? styles.completedCircle : styles.pendingCircle,
-            ]}
-          />
-          <Text
-            style={[
-              styles.timelineText,
-              activeTask.status === 'Picked Up' ? styles.completedText : styles.pendingText,
-            ]}
-          >
-            Picked Up From Hotel
-          </Text>
-        </View>
-      </View>
-
-      <View style={{ marginTop: 30 }} />
-
-      {activeTask.status === 'Accepted' && (
-        <CustomButton
-          title="Picked Up From Hotel"
-          onPress={handleNextStep}
-        />
-      )}
+      ))}
     </ScrollView>
   );
 }
@@ -94,6 +96,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666666',
     marginBottom: 20,
+  },
+  taskWrapper: {
+    marginBottom: 40,
+    backgroundColor: '#ffffff',
+    padding: 15,
+    borderRadius: 15,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   card: {
     backgroundColor: '#ffffff',
