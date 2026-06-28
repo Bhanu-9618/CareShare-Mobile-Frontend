@@ -24,7 +24,7 @@ export default function DonorHomeScreen() {
       <View style={styles.detailsContainer}>
         <Text style={styles.foodName}>{item.foodName}</Text>
         <Text style={styles.hotelName}>{item.hotelName}</Text>
-        <Text style={styles.addressText}>📍 {item.address}</Text>
+        <Text style={styles.addressText}>{item.address}</Text>
         <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
         <View style={styles.expiryRow}>
           <Text style={styles.expiry}>Expires: {item.expiryTime}</Text>
@@ -109,6 +109,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 12,
     flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 15,
     padding: 12,
     elevation: 2,
@@ -135,7 +136,8 @@ const styles = StyleSheet.create({
   },
   hotelName: {
     fontSize: 13,
-    color: '#666',
+    color: '#444444',
+    fontWeight: '600',
   },
   quantity: {
     fontSize: 13,

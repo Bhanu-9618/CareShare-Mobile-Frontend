@@ -69,8 +69,8 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
                 </View>
             </View>
 
-            <Text style={styles.detailText}>🏢 From: {item.hotelName}</Text>
-            <Text style={styles.detailText}>📍 Location: {item.address}</Text>
+            <Text style={styles.hotelName}>🏢 From: {item.hotelName}</Text>
+            <Text style={styles.addressText}>Location: {item.address}</Text>
             <Text style={styles.detailText}>📦 Quantity: {item.quantity}</Text>
 
             {item.status === 'Requested' && (
@@ -286,7 +286,18 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333333',
-        marginBottom: 5,
+        marginBottom: 8,
+    },
+    hotelName: {
+        fontSize: 14,
+        color: '#444444',
+        fontWeight: '600',
+        marginBottom: 4,
+    },
+    addressText: {
+        fontSize: 13,
+        color: '#888888',
+        marginBottom: 4,
     },
     subEmptyText: {
         fontSize: 13,

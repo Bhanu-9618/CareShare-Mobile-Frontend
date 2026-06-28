@@ -40,7 +40,7 @@ export default function FoodDetailScreen({ route, navigation }: any) {
       <View style={styles.infoContainer}>
         <Text style={styles.foodName}>{foodItem.foodName}</Text>
         <Text style={styles.hotelName}>Provided by: {foodItem.hotelName}</Text>
-        <Text style={styles.hotelName}>Location: {foodItem.address}</Text>
+        <Text style={styles.addressText}>Location: {foodItem.address}</Text>
 
         <View style={styles.divider} />
 
@@ -97,9 +97,15 @@ const styles = StyleSheet.create({
     color: '#333333',
   },
   hotelName: {
-    fontSize: 15,
-    color: '#666666',
-    marginTop: 5,
+    fontSize: 16,
+    color: '#444444',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  addressText: {
+    fontSize: 14,
+    color: '#888888',
+    marginBottom: 15,
   },
   divider: {
     height: 1,

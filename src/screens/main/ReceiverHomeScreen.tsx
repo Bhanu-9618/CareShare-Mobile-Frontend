@@ -9,7 +9,7 @@ export default function ReceiverHomeScreen() {
   const incomingDeliveries = foodList.filter(
     (item) =>
       item.assignedReceiverId === user?.id &&
-      item.status === 'Requested' && 
+      item.status === 'Requested' &&
       item.generatedOtp !== null
   );
 
@@ -33,11 +33,11 @@ export default function ReceiverHomeScreen() {
           </Text>
         </View>
       </View>
-      
-      <Text style={styles.hotelName}>📍 Dispatcher: {item.hotelName}</Text>
-      <Text style={styles.hotelName}>🏠 Address: {item.address}</Text>
+
+      <Text style={styles.hotelName}>Dispatcher: {item.hotelName}</Text>
+      <Text style={styles.addressText}>Address: {item.address}</Text>
       <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
-      
+
       <View style={styles.progressContainer}>
         <Text style={styles.progressText}>
           Volunteer has confirmed your request and is heading to your location!
@@ -121,7 +121,13 @@ const styles = StyleSheet.create({
   },
   hotelName: {
     fontSize: 13,
-    color: '#555555',
+    color: '#444444',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  addressText: {
+    fontSize: 12,
+    color: '#888888',
     marginBottom: 4,
   },
   quantity: {

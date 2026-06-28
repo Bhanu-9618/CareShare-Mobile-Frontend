@@ -34,7 +34,7 @@ export default function ReceiverLiveFeedScreen() {
         <View>
           <Text style={styles.foodName}>{item.foodName}</Text>
           <Text style={styles.hotelName}>🏢 Sourced from: {item.hotelName}</Text>
-          <Text style={styles.hotelName}>📍 Address: {item.address}</Text>
+          <Text style={styles.addressText}>Address: {item.address}</Text>
         </View>
         <View style={styles.liveBadge}>
           <Text style={styles.liveText}>In Transit</Text>
@@ -140,8 +140,14 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   hotelName: {
+    fontSize: 13,
+    color: '#444444',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  addressText: {
     fontSize: 12,
-    color: '#666666',
+    color: '#888888',
   },
   liveBadge: {
     backgroundColor: '#e8f5e9',

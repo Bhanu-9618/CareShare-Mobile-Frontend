@@ -32,8 +32,8 @@ export default function ReceiverRequestsScreen() {
         </View>
       </View>
 
-      <Text style={styles.detailText}>🏢 Hotel: {item.hotelName}</Text>
-      <Text style={styles.detailText}>📍 Location: {item.address}</Text>
+      <Text style={styles.hotelName}>🏢 Hotel: {item.hotelName}</Text>
+      <Text style={styles.addressText}>Location: {item.address}</Text>
       <Text style={styles.detailText}>🚴 Volunteer: Hero Delivery</Text>
 
       {item.generatedOtp && item.status !== 'Completed' ? (
@@ -127,6 +127,17 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: 'bold',
     textTransform: 'uppercase',
+  },
+  hotelName: {
+    fontSize: 14,
+    color: '#444444',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  addressText: {
+    fontSize: 13,
+    color: '#888888',
+    marginBottom: 4,
   },
   detailText: {
     fontSize: 13,

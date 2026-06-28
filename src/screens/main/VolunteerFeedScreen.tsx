@@ -30,11 +30,11 @@ export default function VolunteerFeedScreen({ navigation }: any) {
             <Text style={styles.distanceText}>Colombo</Text>
           </View>
         </View>
-        
-        <Text style={styles.hotelName}>📍 {item.hotelName}</Text>
-        <Text style={styles.hotelName}>🏠 {item.address}</Text>
+
+        <Text style={styles.hotelName}>{item.hotelName}</Text>
+        <Text style={styles.addressText}>{item.address}</Text>
         <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
-        
+
         <View style={styles.cardFooter}>
           <Text style={styles.expiry}>Expires: {item.expiryTime}</Text>
           <Text style={styles.actionText}>View Details →</Text>
@@ -199,8 +199,14 @@ const styles = StyleSheet.create({
   },
   hotelName: {
     fontSize: 13,
-    color: '#555',
-    marginTop: 2,
+    color: '#444444',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  addressText: {
+    fontSize: 12,
+    color: '#888888',
+    marginBottom: 6,
   },
   quantity: {
     fontSize: 13,

@@ -34,9 +34,9 @@ export default function OngoingTaskScreen({ navigation }: any) {
       <View style={styles.card}>
         <Text style={styles.foodName}>{activeTask.foodName}</Text>
         <Text style={styles.quantity}>Quantity: {activeTask.quantity}</Text>
-        <Text style={styles.hotelName}>📍 From: {activeTask.hotelName}</Text>
-        <Text style={styles.hotelName}>🏠 Address: {activeTask.address}</Text>
-        <Text style={styles.receiverName}>🏠 To: Community Center - Colombo 03</Text>
+        <Text style={styles.hotelName}>From: {activeTask.hotelName}</Text>
+        <Text style={styles.addressText}>Address: {activeTask.address}</Text>
+        <Text style={styles.addressText}>To: Community Center - Colombo 03</Text>
       </View>
 
       <View style={styles.timelineContainer}>
@@ -64,7 +64,7 @@ export default function OngoingTaskScreen({ navigation }: any) {
             Picked Up From Hotel
           </Text>
         </View>
-        </View>
+      </View>
 
       <View style={{ marginTop: 30 }} />
 
@@ -119,8 +119,14 @@ const styles = StyleSheet.create({
   },
   hotelName: {
     fontSize: 14,
-    color: '#333333',
-    marginBottom: 8,
+    color: '#444444',
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  addressText: {
+    fontSize: 13,
+    color: '#888888',
+    marginBottom: 2,
   },
   receiverName: {
     fontSize: 14,

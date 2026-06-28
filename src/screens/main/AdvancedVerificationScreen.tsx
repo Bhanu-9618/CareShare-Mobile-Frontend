@@ -51,7 +51,7 @@ export default function AdvancedVerificationScreen({ route, navigation }: any) {
       <View style={styles.itemCard}>
         <Text style={styles.itemName}>{currentItem?.foodName}</Text>
         <Text style={styles.itemHotel}>🏢 Sourced: {currentItem?.hotelName}</Text>
-        <Text style={styles.itemHotel}>📍 Location: {currentItem?.address}</Text>
+        <Text style={styles.addressText}>Location: {currentItem?.address}</Text>
       </View>
 
       <View style={styles.otpContainer}>
@@ -108,9 +108,14 @@ const styles = StyleSheet.create({
     color: '#333333',
   },
   itemHotel: {
+    fontSize: 14,
+    color: '#444444',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  addressText: {
     fontSize: 13,
-    color: '#666666',
-    marginTop: 4,
+    color: '#888888',
   },
   otpContainer: {
     flexDirection: 'row',

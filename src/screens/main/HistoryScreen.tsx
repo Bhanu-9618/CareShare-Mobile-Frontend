@@ -16,8 +16,8 @@ export default function HistoryScreen() {
         </View>
       </View>
       
-      <Text style={styles.details}>🏢 From: {item.hotelName}</Text>
-      <Text style={styles.details}>📍 Location: {item.address}</Text>
+      <Text style={styles.hotelName}>🏢 From: {item.hotelName}</Text>
+      <Text style={styles.addressText}>Location: {item.address}</Text>
       <Text style={styles.details}>📦 Quantity: {item.quantity}</Text>
       <Text style={styles.timestamp}>⏱️ Expiry Ref: {item.expiryTime}</Text>
     </View>
@@ -94,6 +94,17 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: 'bold',
     color: '#155724',
+  },
+  hotelName: {
+    fontSize: 14,
+    color: '#444444',
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  addressText: {
+    fontSize: 13,
+    color: '#888888',
+    marginBottom: 4,
   },
   details: {
     fontSize: 13,
