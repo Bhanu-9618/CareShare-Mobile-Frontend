@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
+import { useApp } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
 
 export default function LoginScreen({ navigation }: any) {
+  const { login } = useApp();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
@@ -25,7 +27,12 @@ export default function LoginScreen({ navigation }: any) {
     setErrors(localErrors);
 
     if (valid) {
-      navigation.navigate('MainTabs');
+      const result = login(email, password);
+      if (!result.success) {
+        Alert.alert('Login Failed', result.message);
+      }
+      // If success, the navigator will automatically switch to the role-based tabs
+      // because user state changes from null to a user object
     }
   };
 

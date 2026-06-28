@@ -4,10 +4,13 @@ import { useApp, FoodItem } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
 
 export default function ReceiverHomeScreen() {
-  const { foodList } = useApp();
+  const { user, foodList } = useApp();
 
   const incomingDeliveries = foodList.filter(
-    (item) => item.status === 'Accepted' || item.status === 'Picked Up'
+    (item) =>
+      item.assignedReceiverId === user?.id &&
+      item.status === 'Requested' && 
+      item.generatedOtp !== null
   );
 
   const renderIncomingCard = ({ item }: { item: FoodItem }) => (
@@ -17,16 +20,16 @@ export default function ReceiverHomeScreen() {
         <View
           style={[
             styles.statusBadge,
-            { backgroundColor: item.status === 'Picked Up' ? '#fff3cd' : '#e2e3e5' },
+            { backgroundColor: '#d4edda' },
           ]}
         >
           <Text
             style={[
               styles.statusText,
-              { color: item.status === 'Picked Up' ? '#856404' : '#383d41' },
+              { color: '#155724' },
             ]}
           >
-            {item.status}
+            Confirmed
           </Text>
         </View>
       </View>
@@ -36,9 +39,7 @@ export default function ReceiverHomeScreen() {
       
       <View style={styles.progressContainer}>
         <Text style={styles.progressText}>
-          {item.status === 'Accepted'
-            ? 'Volunteer is on the way to pick up the food.'
-            : 'Food picked up! Courier is heading to your location.'}
+          Volunteer has confirmed your request and is heading to your location!
         </Text>
       </View>
     </View>

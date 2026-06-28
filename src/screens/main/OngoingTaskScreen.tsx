@@ -4,10 +4,10 @@ import { useApp } from '../../context/AppContext';
 import CustomButton from '../../components/CustomButton';
 
 export default function OngoingTaskScreen({ navigation }: any) {
-  const { foodList, updateFoodStatus } = useApp();
+  const { user, foodList, updateFoodStatus } = useApp();
 
   const activeTask = foodList.find(
-    (item) => item.status === 'Accepted' || item.status === 'Picked Up'
+    (item) => item.currentVolunteerId === user?.id && item.status === 'Accepted'
   );
 
   if (!activeTask) {
@@ -21,10 +21,8 @@ export default function OngoingTaskScreen({ navigation }: any) {
 
   const handleNextStep = () => {
     if (activeTask.status === 'Accepted') {
-      updateFoodStatus(activeTask.id, 'Picked Up');
+      updateFoodStatus(activeTask.id, 'Live', user?.id);
       Alert.alert('Status Updated', 'Food item marked as Picked Up from the hotel!');
-    } else if (activeTask.status === 'Picked Up') {
-      navigation.navigate('Verification', { foodId: activeTask.id });
     }
   };
 
@@ -65,20 +63,16 @@ export default function OngoingTaskScreen({ navigation }: any) {
             Picked Up From Hotel
           </Text>
         </View>
-        <View style={styles.line} />
-
-        <View style={styles.timelineRow}>
-          <View style={[styles.circle, styles.pendingCircle]} />
-          <Text style={[styles.timelineText, styles.pendingText]}>Arrived & Verified</Text>
         </View>
-      </View>
 
       <View style={{ marginTop: 30 }} />
 
-      <CustomButton
-        title={activeTask.status === 'Accepted' ? 'Picked Up From Hotel' : 'Arrived at Destination'}
-        onPress={handleNextStep}
-      />
+      {activeTask.status === 'Accepted' && (
+        <CustomButton
+          title="Picked Up From Hotel"
+          onPress={handleNextStep}
+        />
+      )}
     </ScrollView>
   );
 }

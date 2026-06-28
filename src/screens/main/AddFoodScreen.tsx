@@ -32,14 +32,7 @@ export default function AddFoodScreen({ navigation }: any) {
     setErrors(localErrors);
 
     if (valid) {
-      addFoodItem({
-        foodName,
-        quantity,
-        expiryTime,
-        hotelName: user?.name || 'Unknown Hotel',
-        latitude: 6.9271,
-        longitude: 79.8612,
-      });
+      addFoodItem(foodName, quantity, expiryTime);
 
       Alert.alert('Success', 'Donation posted successfully!', [
         {
@@ -48,7 +41,7 @@ export default function AddFoodScreen({ navigation }: any) {
             setFoodName('');
             setQuantity('');
             setExpiryTime('');
-            navigation.navigate('Home');
+            navigation.navigate('Donor Home');
           },
         },
       ]);

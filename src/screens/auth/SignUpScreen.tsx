@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
+import { useApp } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
 
 export default function SignUpScreen({ navigation }: any) {
+  const { register } = useApp();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'Donor' | 'Volunteer' | 'Receiver'>('Donor'); // Default Role
+  const [role, setRole] = useState<'Donor' | 'Volunteer' | 'Receiver'>('Donor');
   const [errors, setErrors] = useState<any>({});
 
   const roles: ('Donor' | 'Volunteer' | 'Receiver')[] = ['Donor', 'Volunteer', 'Receiver'];
@@ -33,7 +35,14 @@ export default function SignUpScreen({ navigation }: any) {
     setErrors(localErrors);
 
     if (valid) {
-      navigation.navigate('Login');
+      const result = register(name, email, password, role);
+      if (result.success) {
+        Alert.alert('Success', result.message, [
+          { text: 'OK', onPress: () => navigation.navigate('Login') },
+        ]);
+      } else {
+        Alert.alert('Registration Failed', result.message);
+      }
     }
   };
 

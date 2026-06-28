@@ -5,7 +5,7 @@ import CustomButton from '../../components/CustomButton';
 
 export default function FoodDetailScreen({ route, navigation }: any) {
   const { foodId } = route.params;
-  const { foodList, updateFoodStatus } = useApp();
+  const { foodList, updateFoodStatus, user } = useApp();
 
   const foodItem = foodList.find((item) => item.id === foodId);
 
@@ -18,8 +18,8 @@ export default function FoodDetailScreen({ route, navigation }: any) {
   }
 
   const handleClaimDonation = () => {
-    updateFoodStatus(foodId, 'Accepted');
-    
+    updateFoodStatus(foodId, 'Accepted', user?.id);
+
     Alert.alert('Success', 'You have successfully claimed this donation!', [
       {
         text: 'OK',
@@ -40,7 +40,7 @@ export default function FoodDetailScreen({ route, navigation }: any) {
       <View style={styles.infoContainer}>
         <Text style={styles.foodName}>{foodItem.foodName}</Text>
         <Text style={styles.hotelName}>Provided by: {foodItem.hotelName}</Text>
-        
+
         <View style={styles.divider} />
 
         <View style={styles.row}>
@@ -66,7 +66,7 @@ export default function FoodDetailScreen({ route, navigation }: any) {
         </Text>
 
         <View style={{ marginTop: 30 }} />
-        
+
         <CustomButton title="Claim Donation" onPress={handleClaimDonation} />
       </View>
     </ScrollView>

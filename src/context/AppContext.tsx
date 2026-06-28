@@ -1,103 +1,141 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export interface FoodItem {
+export interface User {
   id: string;
-  foodName: string;
-  quantity: string;
-  hotelName: string;
-  status: 'Active' | 'Accepted' | 'Picked Up' | 'Completed';
-  expiryTime: string;
-  image?: string;
-  latitude: number;
-  longitude: number;
-}
-
-export interface UserProfile {
   name: string;
   email: string;
   role: 'Donor' | 'Volunteer' | 'Receiver';
 }
 
+export interface RegisteredUser {
+  name: string;
+  email: string;
+  password: string;
+  role: 'Donor' | 'Volunteer' | 'Receiver';
+}
+
+export interface FoodItem {
+  id: string;
+  foodName: string;
+  hotelName: string;
+  quantity: string;
+  expiryTime: string;
+  image?: string;
+  status: 'Active' | 'Accepted' | 'Picked Up' | 'Live' | 'Requested' | 'Completed';
+  currentVolunteerId: string | null;
+  assignedReceiverId: string | null;
+  generatedOtp: string | null;
+}
+
 interface AppContextType {
+  user: User | null;
   foodList: FoodItem[];
-  user: UserProfile | null;
-  addFoodItem: (item: Omit<FoodItem, 'id' | 'status'>) => void;
-  updateFoodStatus: (id: string, status: FoodItem['status']) => void;
-  loginUser: (profile: UserProfile) => void;
-  logoutUser: () => void;
+  register: (name: string, email: string, password: string, role: 'Donor' | 'Volunteer' | 'Receiver') => { success: boolean; message: string };
+  login: (email: string, password: string) => { success: boolean; message: string };
+  logout: () => void;
+  addFoodItem: (foodName: string, quantity: string, expiryTime: string) => void;
+  updateFoodStatus: (
+    foodId: string,
+    status: FoodItem['status'],
+    volunteerId?: string | null,
+    receiverId?: string | null,
+    otp?: string | null
+  ) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-const initialFoodItems: FoodItem[] = [
-  {
-    id: '1',
-    foodName: 'Rice & Curry Packets',
-    quantity: '15 Packets',
-    hotelName: 'Hilton Colombo',
-    status: 'Active',
-    expiryTime: '10:30 PM',
-    latitude: 6.9344, 
-    longitude: 79.8428,
-  },
-  {
-    id: '2',
-    foodName: 'Assorted Pastries & Breads',
-    quantity: '30 Pcs',
-    hotelName: 'Perera & Sons',
-    status: 'Accepted',
-    expiryTime: '09:00 PM',
-    latitude: 6.9271,
-    longitude: 79.8612,
-  },
-];
+const initialFoodItems: FoodItem[] = [];
 
-export function AppProvider({ children }: { children: ReactNode }) {
+export const AppProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
   const [foodList, setFoodList] = useState<FoodItem[]>(initialFoodItems);
-  const [user, setUser] = useState<UserProfile | null>({
-    name: 'Nipun Bhanuka',
-    email: 'nipun@dalecodelabs.com',
-    role: 'Donor', 
-  });
+  const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
 
-  const addFoodItem = (item: Omit<FoodItem, 'id' | 'status'>) => {
-    const newItem: FoodItem = {
-      ...item,
-      id: Date.now().toString(),
-      status: 'Active',
-    };
-    setFoodList((prevList) => [newItem, ...prevList]);
+  const register = (name: string, email: string, password: string, role: 'Donor' | 'Volunteer' | 'Receiver') => {
+    const existingUser = registeredUsers.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase()
+    );
+    if (existingUser) {
+      return { success: false, message: 'An account with this email already exists.' };
+    }
+
+    setRegisteredUsers((prev) => [...prev, { name, email, password, role }]);
+    return { success: true, message: 'Account created successfully!' };
   };
 
-  const updateFoodStatus = (id: string, status: FoodItem['status']) => {
+  const login = (email: string, password: string) => {
+    const matchedUser = registeredUsers.find(
+      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
+    );
+
+    if (!matchedUser) {
+      return { success: false, message: 'Invalid email or password. Please try again.' };
+    }
+
+    setUser({
+      id: `${matchedUser.role.toLowerCase()}_${matchedUser.email.toLowerCase()}`,
+      name: matchedUser.name,
+      email: matchedUser.email,
+      role: matchedUser.role,
+    });
+
+    return { success: true, message: 'Login successful!' };
+  };
+
+  const logout = () => {
+    setUser(null);
+  };
+
+  const addFoodItem = (foodName: string, quantity: string, expiryTime: string) => {
+    const newItem: FoodItem = {
+      id: Date.now().toString(),
+      foodName,
+      hotelName: user?.name || 'Partner Hotel',
+      quantity,
+      expiryTime,
+      status: 'Active',
+      currentVolunteerId: null,
+      assignedReceiverId: null,
+      generatedOtp: null,
+    };
+    setFoodList((prev) => [newItem, ...prev]);
+  };
+
+  const updateFoodStatus = (
+    foodId: string,
+    status: FoodItem['status'],
+    volunteerId?: string | null,
+    receiverId?: string | null,
+    otp?: string | null
+  ) => {
     setFoodList((prevList) =>
-      prevList.map((item) => (item.id === id ? { ...item, status } : item))
+      prevList.map((item) => {
+        if (item.id === foodId) {
+          const updatedItem = { ...item, status };
+
+          if (volunteerId !== undefined) updatedItem.currentVolunteerId = volunteerId;
+          if (receiverId !== undefined) updatedItem.assignedReceiverId = receiverId;
+          if (otp !== undefined) updatedItem.generatedOtp = otp;
+
+          return updatedItem;
+        }
+        return item;
+      })
     );
   };
 
-  const loginUser = (profile: UserProfile) => setUser(profile);
-  const logoutUser = () => setUser(null);
-
   return (
-    <AppContext.Provider
-      value={{
-        foodList,
-        user,
-        addFoodItem,
-        updateFoodStatus,
-        loginUser,
-        logoutUser,
-      }}
-    >
+    <AppContext.Provider value={{ user, foodList, register, login, logout, addFoodItem, updateFoodStatus }}>
       {children}
     </AppContext.Provider>
   );
-}
+};
 
-export function useApp() {
+export const useApp = () => {
   const context = useContext(AppContext);
   if (!context) {
     throw new Error('useApp must be used within an AppProvider');
   }
   return context;
-}
+};
