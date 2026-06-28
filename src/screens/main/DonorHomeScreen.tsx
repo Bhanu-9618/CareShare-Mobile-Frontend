@@ -6,6 +6,8 @@ import { COLORS } from '../../constants/colors';
 export default function DonorHomeScreen() {
   const { foodList, user } = useApp();
 
+  const activeDonations = foodList.filter((item) => item.status !== 'Completed');
+
   const getStatusColor = (status: FoodItem['status']) => {
     switch (status) {
       case 'Active': return '#007bff';
@@ -41,13 +43,12 @@ export default function DonorHomeScreen() {
       <View style={styles.header}>
         <Text style={styles.welcomeText}>Welcome back,</Text>
         <Text style={styles.userName}>{user?.name || 'Hotel Owner'}</Text>
-        <Text style={styles.roleText}>Dashboard ({user?.role})</Text>
       </View>
 
       <Text style={styles.sectionTitle}>Your Donations</Text>
 
       <FlatList
-        data={foodList}
+        data={activeDonations}
         keyExtractor={(item) => item.id}
         renderItem={renderFoodCard}
         contentContainerStyle={styles.listContainer}
