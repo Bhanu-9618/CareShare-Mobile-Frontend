@@ -10,6 +10,7 @@ export default function SignUpScreen({ navigation }: any) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [address, setAddress] = useState('');
   const [role, setRole] = useState<'Donor' | 'Volunteer' | 'Receiver'>('Donor');
   const [errors, setErrors] = useState<any>({});
 
@@ -31,11 +32,15 @@ export default function SignUpScreen({ navigation }: any) {
       localErrors.password = 'Password must be at least 6 characters';
       valid = false;
     }
+    if (!address.trim()) {
+      localErrors.address = 'Address is required';
+      valid = false;
+    }
 
     setErrors(localErrors);
 
     if (valid) {
-      const result = register(name, email, password, role);
+      const result = register(name, email, password, role, address);
       if (result.success) {
         Alert.alert('Success', result.message, [
           { text: 'OK', onPress: () => navigation.navigate('Login') },
@@ -75,6 +80,14 @@ export default function SignUpScreen({ navigation }: any) {
         onChangeText={setPassword}
         secureTextEntry={true}
         error={errors.password}
+      />
+
+      <CustomInput
+        label="Address"
+        placeholder="123 Main St, City"
+        value={address}
+        onChangeText={setAddress}
+        error={errors.address}
       />
 
       {/* Custom Role Selection UI */}

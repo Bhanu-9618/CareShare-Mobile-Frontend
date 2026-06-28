@@ -5,6 +5,7 @@ export interface User {
   name: string;
   email: string;
   role: 'Donor' | 'Volunteer' | 'Receiver';
+  address: string;
 }
 
 export interface RegisteredUser {
@@ -12,6 +13,7 @@ export interface RegisteredUser {
   email: string;
   password: string;
   role: 'Donor' | 'Volunteer' | 'Receiver';
+  address: string;
 }
 
 export interface FoodItem {
@@ -30,7 +32,7 @@ export interface FoodItem {
 interface AppContextType {
   user: User | null;
   foodList: FoodItem[];
-  register: (name: string, email: string, password: string, role: 'Donor' | 'Volunteer' | 'Receiver') => { success: boolean; message: string };
+  register: (name: string, email: string, password: string, role: 'Donor' | 'Volunteer' | 'Receiver', address: string) => { success: boolean; message: string };
   login: (email: string, password: string) => { success: boolean; message: string };
   logout: () => void;
   addFoodItem: (foodName: string, quantity: string, expiryTime: string) => void;
@@ -52,7 +54,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [foodList, setFoodList] = useState<FoodItem[]>(initialFoodItems);
   const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
 
-  const register = (name: string, email: string, password: string, role: 'Donor' | 'Volunteer' | 'Receiver') => {
+  const register = (name: string, email: string, password: string, role: 'Donor' | 'Volunteer' | 'Receiver', address: string) => {
     const existingUser = registeredUsers.find(
       (u) => u.email.toLowerCase() === email.toLowerCase()
     );
@@ -60,7 +62,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       return { success: false, message: 'An account with this email already exists.' };
     }
 
-    setRegisteredUsers((prev) => [...prev, { name, email, password, role }]);
+    setRegisteredUsers((prev) => [...prev, { name, email, password, role, address }]);
     return { success: true, message: 'Account created successfully!' };
   };
 
@@ -78,6 +80,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       name: matchedUser.name,
       email: matchedUser.email,
       role: matchedUser.role,
+      address: matchedUser.address,
     });
 
     return { success: true, message: 'Login successful!' };
