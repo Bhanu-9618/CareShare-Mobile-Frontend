@@ -12,7 +12,7 @@ export default function HistoryScreen() {
       <View style={styles.cardHeader}>
         <Text style={styles.foodName}>{item.foodName}</Text>
         <View style={styles.successBadge}>
-          <Text style={styles.successText}>Delivered</Text>
+          <Text style={styles.successText}>{item.status}</Text>
         </View>
       </View>
       

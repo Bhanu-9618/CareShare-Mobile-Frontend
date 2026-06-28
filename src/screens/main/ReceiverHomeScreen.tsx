@@ -29,7 +29,7 @@ export default function ReceiverHomeScreen() {
               { color: '#155724' },
             ]}
           >
-            Confirmed
+            {item.status}
           </Text>
         </View>
       </View>

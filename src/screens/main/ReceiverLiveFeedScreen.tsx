@@ -37,7 +37,7 @@ export default function ReceiverLiveFeedScreen() {
           <Text style={styles.addressText}>Address: {item.address}</Text>
         </View>
         <View style={styles.liveBadge}>
-          <Text style={styles.liveText}>In Transit</Text>
+          <Text style={styles.liveText}>{item.status}</Text>
         </View>
       </View>
 

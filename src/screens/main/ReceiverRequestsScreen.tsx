@@ -8,7 +8,7 @@ export default function ReceiverRequestsScreen() {
   const myRequests = foodList.filter(
     (item) =>
       item.assignedReceiverId === user?.id &&
-      (item.status === 'Requested' || item.status === 'Completed')
+      item.status === 'Requested'
   );
 
   const renderRequestItem = ({ item }: { item: FoodItem }) => (
@@ -27,7 +27,7 @@ export default function ReceiverRequestsScreen() {
               { color: item.generatedOtp ? '#155724' : '#856404' },
             ]}
           >
-            {item.generatedOtp ? 'Confirmed' : 'Pending'}
+            {item.status}
           </Text>
         </View>
       </View>
