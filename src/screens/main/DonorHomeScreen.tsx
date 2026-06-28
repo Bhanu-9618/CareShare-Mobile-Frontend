@@ -24,10 +24,10 @@ export default function DonorHomeScreen() {
       <View style={styles.detailsContainer}>
         <Text style={styles.foodName}>{item.foodName}</Text>
         <Text style={styles.hotelName}>{item.hotelName}</Text>
+        <Text style={styles.addressText}>📍 {item.address}</Text>
         <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
-        <Text style={styles.expiry}>Expires: {item.expiryTime}</Text>
-        
-        <View style={styles.statusRow}>
+        <View style={styles.expiryRow}>
+          <Text style={styles.expiry}>Expires: {item.expiryTime}</Text>
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
             <Text style={styles.statusText}>{item.status}</Text>
           </View>
@@ -139,17 +139,24 @@ const styles = StyleSheet.create({
   },
   quantity: {
     fontSize: 13,
-    color: '#444',
-    marginTop: 2,
+    color: '#666666',
+    marginBottom: 8,
+  },
+  addressText: {
+    fontSize: 12,
+    color: '#888888',
+    marginBottom: 8,
   },
   expiry: {
     fontSize: 12,
     color: 'red',
     fontWeight: '500',
   },
-  statusRow: {
+  expiryRow: {
     flexDirection: 'row',
-    marginTop: 5,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 2,
   },
   statusBadge: {
     paddingHorizontal: 10,

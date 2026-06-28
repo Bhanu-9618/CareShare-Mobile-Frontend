@@ -35,6 +35,7 @@ export default function OngoingTaskScreen({ navigation }: any) {
         <Text style={styles.foodName}>{activeTask.foodName}</Text>
         <Text style={styles.quantity}>Quantity: {activeTask.quantity}</Text>
         <Text style={styles.hotelName}>📍 From: {activeTask.hotelName}</Text>
+        <Text style={styles.hotelName}>🏠 Address: {activeTask.address}</Text>
         <Text style={styles.receiverName}>🏠 To: Community Center - Colombo 03</Text>
       </View>
 

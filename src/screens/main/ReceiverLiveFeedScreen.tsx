@@ -34,6 +34,7 @@ export default function ReceiverLiveFeedScreen() {
         <View>
           <Text style={styles.foodName}>{item.foodName}</Text>
           <Text style={styles.hotelName}>🏢 Sourced from: {item.hotelName}</Text>
+          <Text style={styles.hotelName}>📍 Address: {item.address}</Text>
         </View>
         <View style={styles.liveBadge}>
           <Text style={styles.liveText}>In Transit</Text>

@@ -33,6 +33,7 @@ export default function ReceiverRequestsScreen() {
       </View>
 
       <Text style={styles.detailText}>🏢 Hotel: {item.hotelName}</Text>
+      <Text style={styles.detailText}>📍 Location: {item.address}</Text>
       <Text style={styles.detailText}>🚴 Volunteer: Hero Delivery</Text>
 
       {item.generatedOtp && item.status !== 'Completed' ? (

@@ -35,6 +35,7 @@ export default function ReceiverHomeScreen() {
       </View>
       
       <Text style={styles.hotelName}>📍 Dispatcher: {item.hotelName}</Text>
+      <Text style={styles.hotelName}>🏠 Address: {item.address}</Text>
       <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
       
       <View style={styles.progressContainer}>

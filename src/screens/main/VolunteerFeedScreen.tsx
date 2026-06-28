@@ -32,6 +32,7 @@ export default function VolunteerFeedScreen({ navigation }: any) {
         </View>
         
         <Text style={styles.hotelName}>📍 {item.hotelName}</Text>
+        <Text style={styles.hotelName}>🏠 {item.address}</Text>
         <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
         
         <View style={styles.cardFooter}>

@@ -22,6 +22,7 @@ export interface FoodItem {
   hotelName: string;
   quantity: string;
   expiryTime: string;
+  address: string;
   image?: string;
   status: 'Active' | 'Accepted' | 'Picked Up' | 'Live' | 'Requested' | 'Completed';
   currentVolunteerId: string | null;
@@ -97,6 +98,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       hotelName: user?.name || 'Partner Hotel',
       quantity,
       expiryTime,
+      address: user?.address || 'Unknown Address',
       status: 'Active',
       currentVolunteerId: null,
       assignedReceiverId: null,

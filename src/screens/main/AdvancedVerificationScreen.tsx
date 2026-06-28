@@ -51,6 +51,7 @@ export default function AdvancedVerificationScreen({ route, navigation }: any) {
       <View style={styles.itemCard}>
         <Text style={styles.itemName}>{currentItem?.foodName}</Text>
         <Text style={styles.itemHotel}>🏢 Sourced: {currentItem?.hotelName}</Text>
+        <Text style={styles.itemHotel}>📍 Location: {currentItem?.address}</Text>
       </View>
 
       <View style={styles.otpContainer}>

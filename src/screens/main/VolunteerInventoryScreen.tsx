@@ -70,6 +70,7 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
             </View>
 
             <Text style={styles.detailText}>🏢 From: {item.hotelName}</Text>
+            <Text style={styles.detailText}>📍 Location: {item.address}</Text>
             <Text style={styles.detailText}>📦 Quantity: {item.quantity}</Text>
 
             {item.status === 'Requested' && (

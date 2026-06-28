@@ -40,6 +40,7 @@ export default function FoodDetailScreen({ route, navigation }: any) {
       <View style={styles.infoContainer}>
         <Text style={styles.foodName}>{foodItem.foodName}</Text>
         <Text style={styles.hotelName}>Provided by: {foodItem.hotelName}</Text>
+        <Text style={styles.hotelName}>Location: {foodItem.address}</Text>
 
         <View style={styles.divider} />
 

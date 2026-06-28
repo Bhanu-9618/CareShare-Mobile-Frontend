@@ -17,6 +17,7 @@ export default function HistoryScreen() {
       </View>
       
       <Text style={styles.details}>🏢 From: {item.hotelName}</Text>
+      <Text style={styles.details}>📍 Location: {item.address}</Text>
       <Text style={styles.details}>📦 Quantity: {item.quantity}</Text>
       <Text style={styles.timestamp}>⏱️ Expiry Ref: {item.expiryTime}</Text>
     </View>
