@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Image, TouchableOpacity } from 'react-native';
-import { useApp, FoodItem } from '../../context/AppContext';
+import { useApp, FoodItem, getExpiryDisplay } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
 
 export default function VolunteerFeedScreen({ navigation }: any) {
@@ -36,7 +36,7 @@ export default function VolunteerFeedScreen({ navigation }: any) {
         <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
 
         <View style={styles.cardFooter}>
-          <Text style={styles.expiry}>Expires: {item.expiryTime}</Text>
+          <Text style={styles.expiry}>Expires: {getExpiryDisplay(item.expiryTime)}</Text>
           <Text style={styles.actionText}>View Details →</Text>
         </View>
       </View>

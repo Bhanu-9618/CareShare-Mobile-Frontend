@@ -5,6 +5,7 @@ import { useApp } from '../context/AppContext';
 
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
+import VerifyAccountScreen from '../screens/auth/VerifyAccountScreen';
 import DonorHomeScreen from '../screens/main/DonorHomeScreen';
 import AddFoodScreen from '../screens/main/AddFoodScreen';
 import VolunteerFeedScreen from '../screens/main/VolunteerFeedScreen';
@@ -66,6 +67,7 @@ export default function AppNavigator() {
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="SignUp" component={SignUpScreen} />
+          <Stack.Screen name="VerifyAccount" component={VerifyAccountScreen} />
         </>
       ) : (
         <>

@@ -10,6 +10,7 @@ interface CustomInputProps {
   secureTextEntry?: boolean;
   keyboardType?: KeyboardTypeOptions;
   error?: string;
+  maxLength?: number;
 }
 
 export default function CustomInput({
@@ -20,6 +21,7 @@ export default function CustomInput({
   secureTextEntry = false,
   keyboardType = 'default',
   error,
+  maxLength,
 }: CustomInputProps) {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -40,6 +42,7 @@ export default function CustomInput({
           onChangeText={onChangeText}
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType}
+          maxLength={maxLength}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />

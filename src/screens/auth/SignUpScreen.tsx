@@ -43,7 +43,7 @@ export default function SignUpScreen({ navigation }: any) {
       const result = register(name, email, password, role, address);
       if (result.success) {
         Alert.alert('Success', result.message, [
-          { text: 'OK', onPress: () => navigation.navigate('Login') },
+          { text: 'OK', onPress: () => navigation.navigate('VerifyAccount') },
         ]);
       } else {
         Alert.alert('Registration Failed', result.message);

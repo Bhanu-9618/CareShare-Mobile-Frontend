@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Image } from 'react-native';
 import { useApp } from '../../context/AppContext';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
@@ -10,7 +10,21 @@ export default function AddFoodScreen({ navigation }: any) {
   const [foodName, setFoodName] = useState('');
   const [quantity, setQuantity] = useState('');
   const [expiryTime, setExpiryTime] = useState('');
+  const [imageUri, setImageUri] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>({});
+
+  const handleSelectImage = () => {
+    // Mock image selection since we haven't installed an image picker library yet.
+    // In a real scenario, you'd use react-native-image-picker here.
+    Alert.alert(
+      'Select Image',
+      'For now, this will attach a sample food image.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Attach Sample', onPress: () => setImageUri('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60') },
+      ]
+    );
+  };
 
   const handlePostDonation = () => {
     let valid = true;
@@ -24,15 +38,25 @@ export default function AddFoodScreen({ navigation }: any) {
       localErrors.quantity = 'Quantity is required';
       valid = false;
     }
+    const isNumberRegex = /^\d+$/;
+
     if (!expiryTime.trim()) {
-      localErrors.expiryTime = 'Expiry time is required';
+      localErrors.expiryTime = 'Expiry time in hours is required';
+      valid = false;
+    } else if (!isNumberRegex.test(expiryTime)) {
+      localErrors.expiryTime = 'Please enter only a number (e.g. 2)';
       valid = false;
     }
 
     setErrors(localErrors);
 
     if (valid) {
-      addFoodItem(foodName, quantity, expiryTime);
+      // Calculate future expiry time based on hours inputted
+      const expiryDate = new Date();
+      expiryDate.setHours(expiryDate.getHours() + parseInt(expiryTime, 10));
+      const isoExpiryString = expiryDate.toISOString();
+
+      addFoodItem(foodName, quantity, isoExpiryString, imageUri || undefined);
 
       Alert.alert('Success', 'Donation posted successfully!', [
         {
@@ -41,6 +65,7 @@ export default function AddFoodScreen({ navigation }: any) {
             setFoodName('');
             setQuantity('');
             setExpiryTime('');
+            setImageUri(null);
             navigation.navigate('Donor Home');
           },
         },
@@ -70,12 +95,22 @@ export default function AddFoodScreen({ navigation }: any) {
       />
 
       <CustomInput
-        label="Expiry Time"
-        placeholder="e.g., 09:30 PM, In 2 hours"
+        label="Expiry Time (in hours)"
+        placeholder="e.g., 2 (within 2 hours)"
         value={expiryTime}
-        onChangeText={setExpiryTime}
+        onChangeText={(text) => setExpiryTime(text.replace(/[^0-9]/g, ''))}
         error={errors.expiryTime}
+        keyboardType="number-pad"
       />
+
+      <Text style={styles.imageLabel}>Food Image</Text>
+      <TouchableOpacity style={styles.imageContainer} onPress={handleSelectImage}>
+        {imageUri ? (
+          <Image source={{ uri: imageUri }} style={styles.previewImage} />
+        ) : (
+          <Text style={styles.imagePlaceholderText}>+ Tap to select an image</Text>
+        )}
+      </TouchableOpacity>
 
       <View style={{ marginTop: 20 }} />
 
@@ -101,5 +136,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 25,
+  },
+  imageLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  imageContainer: {
+    height: 150,
+    width: '100%',
+    backgroundColor: '#f9f9f9',
+    borderWidth: 1.5,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+  },
+  imagePlaceholderText: {
+    color: '#999',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  previewImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
 });

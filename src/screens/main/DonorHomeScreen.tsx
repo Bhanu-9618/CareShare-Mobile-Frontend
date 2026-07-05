@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
-import { useApp, FoodItem } from '../../context/AppContext';
+import { useApp, FoodItem, getExpiryDisplay } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
 
 export default function DonorHomeScreen() {
@@ -32,7 +32,7 @@ export default function DonorHomeScreen() {
           <Text style={styles.volunteerText}>Accepted by: {item.currentVolunteerId}</Text>
         )}
         <View style={styles.expiryRow}>
-          <Text style={styles.expiry}>Expires: {item.expiryTime}</Text>
+          <Text style={styles.expiry}>Expires: {getExpiryDisplay(item.expiryTime)}</Text>
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
             <Text style={styles.statusText}>{item.status}</Text>
           </View>
