@@ -1,21 +1,34 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import { COLORS } from '../../constants/colors';
+import { useMutation } from '@tanstack/react-query';
+import { authService } from '../../services/authService';
 
-export default function VerifyAccountScreen({ navigation }: any) {
+export default function VerifyAccountScreen({ route, navigation }: any) {
+  const { email } = route.params || {};
   const [otp, setOtp] = useState('');
+
+  const verifyMutation = useMutation({
+    mutationFn: (code: string) => authService.verify(email, code),
+    onSuccess: (data) => {
+      Alert.alert('Success', data.message || 'Email verified successfully!', [
+        { text: 'OK', onPress: () => navigation.navigate('Login') },
+      ]);
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Invalid verification code provided, please try again.';
+      Alert.alert('Verification Failed', errorMessage);
+    }
+  });
 
   const handleVerify = () => {
     if (otp.length < 4) {
       Alert.alert('Invalid OTP', 'Please enter a valid OTP code.');
       return;
     }
-    // Simulate successful verification
-    Alert.alert('Success', 'Account verified successfully!', [
-      { text: 'OK', onPress: () => navigation.navigate('Login') },
-    ]);
+    verifyMutation.mutate(otp);
   };
 
   return (
@@ -34,10 +47,14 @@ export default function VerifyAccountScreen({ navigation }: any) {
 
       <View style={{ marginTop: 20 }} />
 
-      <CustomButton title="Verify" onPress={handleVerify} />
+      <CustomButton 
+        title={verifyMutation.isPending ? "Verifying..." : "Verify"} 
+        onPress={handleVerify} 
+        disabled={verifyMutation.isPending}
+      />
 
       <View style={styles.footer}>
-        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.backLink}>Back to Register Form</Text>
         </TouchableOpacity>
       </View>

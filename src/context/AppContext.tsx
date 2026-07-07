@@ -33,8 +33,8 @@ export interface FoodItem {
 interface AppContextType {
   user: User | null;
   foodList: FoodItem[];
-  register: (name: string, email: string, password: string, role: 'Donor' | 'Volunteer' | 'Receiver', address: string) => { success: boolean; message: string };
-  login: (email: string, password: string) => { success: boolean; message: string };
+  register: () => { success: boolean; message: string };
+  login: () => { success: boolean; message: string };
   logout: () => void;
   addFoodItem: (foodName: string, quantity: string, expiryTime: string, image?: string) => void;
   updateFoodStatus: (
@@ -83,35 +83,17 @@ export const getExpiryDisplay = (isoString: string) => {
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [foodList, setFoodList] = useState<FoodItem[]>(initialFoodItems);
-  const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
-
-  const register = (name: string, email: string, password: string, role: 'Donor' | 'Volunteer' | 'Receiver', address: string) => {
-    const existingUser = registeredUsers.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase()
-    );
-    if (existingUser) {
-      return { success: false, message: 'An account with this email already exists.' };
-    }
-
-    setRegisteredUsers((prev) => [...prev, { name, email, password, role, address }]);
+  const register = () => {
     return { success: true, message: 'Account created successfully!' };
   };
 
-  const login = (email: string, password: string) => {
-    const matchedUser = registeredUsers.find(
-      (u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password
-    );
-
-    if (!matchedUser) {
-      return { success: false, message: 'Invalid email or password. Please try again.' };
-    }
-
+  const login = () => {
     setUser({
-      id: `${matchedUser.role.toLowerCase()}_${matchedUser.email.toLowerCase()}`,
-      name: matchedUser.name,
-      email: matchedUser.email,
-      role: matchedUser.role,
-      address: matchedUser.address,
+      id: `mock_donor_id`,
+      name: 'Mock Donor',
+      email: 'donor@test.com',
+      role: 'Donor',
+      address: '123 Donor St',
     });
 
     return { success: true, message: 'Login successful!' };

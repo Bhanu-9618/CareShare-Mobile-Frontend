@@ -12,27 +12,10 @@ export default function LoginScreen({ navigation }: any) {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const handleLogin = () => {
-    let valid = true;
-    let localErrors: { email?: string; password?: string } = {};
-
-    if (!email.includes('@')) {
-      localErrors.email = 'Please enter a valid email address';
-      valid = false;
-    }
-    if (password.length < 6) {
-      localErrors.password = 'Password must be at least 6 characters';
-      valid = false;
-    }
-
-    setErrors(localErrors);
-
-    if (valid) {
-      const result = login(email, password);
-      if (!result.success) {
-        Alert.alert('Login Failed', result.message);
-      }
-      // If success, the navigator will automatically switch to the role-based tabs
-      // because user state changes from null to a user object
+    // Hardcoded logic to jump straight to Donor screen for Phase 1
+    const result = login();
+    if (!result.success) {
+      Alert.alert('Login Failed', result.message);
     }
   };
 

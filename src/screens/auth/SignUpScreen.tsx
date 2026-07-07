@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
-import { useApp } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
+import { useMutation } from '@tanstack/react-query';
+import { authService } from '../../services/authService';
 
 export default function SignUpScreen({ navigation }: any) {
-  const { register } = useApp();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,6 +15,27 @@ export default function SignUpScreen({ navigation }: any) {
   const [errors, setErrors] = useState<any>({});
 
   const roles: ('Donor' | 'Volunteer' | 'Receiver')[] = ['Donor', 'Volunteer', 'Receiver'];
+
+  const registerMutation = useMutation({
+    mutationFn: authService.register,
+    onSuccess: (data) => {
+      // Navigate to verify account screen with the email we just registered
+      navigation.navigate('VerifyAccount', { email });
+    },
+    onError: (error: any, variables: any) => {
+      // Handle the 400 Bad Request if email exists or other errors
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Registration Failed';
+
+      if (errorMessage.toLowerCase().includes('already exist') || errorMessage.toLowerCase().includes('registered successfully')) {
+        Alert.alert('Email already exists!', 'Please verify your account or login.', [
+          { text: 'Verify', onPress: () => navigation.navigate('VerifyAccount', { email: variables.email }) },
+          { text: 'Login', onPress: () => navigation.goBack() }
+        ]);
+      } else {
+        Alert.alert('Registration Failed', errorMessage);
+      }
+    }
+  });
 
   const handleSignUp = () => {
     let valid = true;
@@ -28,10 +49,14 @@ export default function SignUpScreen({ navigation }: any) {
       localErrors.email = 'Valid email is required';
       valid = false;
     }
-    if (password.length < 6) {
-      localErrors.password = 'Password must be at least 6 characters';
+
+    // Password rules: Min 8, 1 uppercase, 1 lowercase, 1 number, 1 symbol
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d\s]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      localErrors.password = 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one symbol';
       valid = false;
     }
+
     if (!address.trim()) {
       localErrors.address = 'Address is required';
       valid = false;
@@ -40,14 +65,13 @@ export default function SignUpScreen({ navigation }: any) {
     setErrors(localErrors);
 
     if (valid) {
-      const result = register(name, email, password, role, address);
-      if (result.success) {
-        Alert.alert('Success', result.message, [
-          { text: 'OK', onPress: () => navigation.navigate('VerifyAccount') },
-        ]);
-      } else {
-        Alert.alert('Registration Failed', result.message);
-      }
+      registerMutation.mutate({
+        email,
+        password,
+        name,
+        role: role.toUpperCase(),
+        address
+      });
     }
   };
 
@@ -111,11 +135,23 @@ export default function SignUpScreen({ navigation }: any) {
 
       <View style={{ marginTop: 20 }} />
 
-      <CustomButton title="Register" onPress={handleSignUp} />
+      <CustomButton
+        title={registerMutation.isPending ? "Registering..." : "Register"}
+        onPress={handleSignUp}
+        disabled={registerMutation.isPending}
+      />
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => {
+          // Clear form when going to login
+          setName('');
+          setEmail('');
+          setPassword('');
+          setAddress('');
+          setErrors({});
+          navigation.goBack();
+        }}>
           <Text style={styles.loginLink}>Login</Text>
         </TouchableOpacity>
       </View>
