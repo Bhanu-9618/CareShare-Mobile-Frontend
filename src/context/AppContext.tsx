@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { authService } from '../services/authService';
 
 export interface User {
   id: string;
@@ -34,7 +35,7 @@ interface AppContextType {
   user: User | null;
   foodList: FoodItem[];
   register: () => { success: boolean; message: string };
-  login: () => { success: boolean; message: string };
+  login: (userData: User) => void;
   logout: () => void;
   addFoodItem: (foodName: string, quantity: string, expiryTime: string, image?: string) => void;
   updateFoodStatus: (
@@ -87,19 +88,12 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return { success: true, message: 'Account created successfully!' };
   };
 
-  const login = () => {
-    setUser({
-      id: `mock_donor_id`,
-      name: 'Mock Donor',
-      email: 'donor@test.com',
-      role: 'Donor',
-      address: '123 Donor St',
-    });
-
-    return { success: true, message: 'Login successful!' };
+  const login = (userData: User) => {
+    setUser(userData);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await authService.logout();
     setUser(null);
   };
 

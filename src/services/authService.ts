@@ -3,9 +3,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const authService = {
   login: async (email: string, password: string) => {
-    // const response = await axiosClient.post('/auth/login', { email, password });
-    // await AsyncStorage.setItem('userToken', response.data.token);
-    // return response.data;
+    const response = await axiosClient.post('/auth/login', { email, password });
+    // Assuming backend returns { IdToken: "...", AccessToken: "..." }
+    const idToken = response.data.IdToken || response.data.token;
+    if (idToken) {
+      await AsyncStorage.setItem('userToken', idToken);
+    }
+    return response.data;
   },
   
   register: async (data: any) => {

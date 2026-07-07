@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import { useApp } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
+import { useMutation } from '@tanstack/react-query';
+import { authService } from '../../services/authService';
+import { decodeJwt } from '../../utils/jwtUtils';
 
 export default function LoginScreen({ navigation }: any) {
   const { login } = useApp();
@@ -11,12 +14,52 @@ export default function LoginScreen({ navigation }: any) {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  const handleLogin = () => {
-    // Hardcoded logic to jump straight to Donor screen for Phase 1
-    const result = login();
-    if (!result.success) {
-      Alert.alert('Login Failed', result.message);
+  const loginMutation = useMutation({
+    mutationFn: () => authService.login(email, password),
+    onSuccess: (data) => {
+      // Decode the IdToken to get the custom role and user details
+      const idToken = data.IdToken || data.token;
+      if (!idToken) {
+        Alert.alert('Login Error', 'Failed to retrieve user token from server.');
+        return;
+      }
+
+      const decoded = decodeJwt(idToken);
+      if (!decoded) {
+        Alert.alert('Login Error', 'Failed to decode user token.');
+        return;
+      }
+
+      // Map the decoded token to our internal User object
+      const roleStr = decoded['custom:role'] || 'Donor';
+      // Format role to Capitalized (e.g. "DONOR" -> "Donor")
+      const formattedRole = roleStr.charAt(0).toUpperCase() + roleStr.slice(1).toLowerCase();
+
+      login({
+        id: decoded.sub,
+        name: decoded.name || decoded.email || 'User',
+        email: decoded.email,
+        role: formattedRole as 'Donor' | 'Volunteer' | 'Receiver',
+        address: decoded.address?.formatted || 'Unknown Address',
+      });
+      // Navigation is handled automatically by AppNavigator reacting to user state change
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Login Failed';
+      if (error.response?.status === 401 || errorMessage.toLowerCase().includes('invalid')) {
+        Alert.alert('Invalid credentials', 'Please check your details or register.');
+      } else {
+        Alert.alert('Login Failed', errorMessage);
+      }
     }
+  });
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      Alert.alert('Validation Error', 'Please enter both email and password.');
+      return;
+    }
+    loginMutation.mutate();
   };
 
   return (
@@ -44,7 +87,11 @@ export default function LoginScreen({ navigation }: any) {
 
       <View style={{ marginTop: 15 }} />
 
-      <CustomButton title="Login" onPress={handleLogin} />
+      <CustomButton 
+        title={loginMutation.isPending ? "Logging in..." : "Login"} 
+        onPress={handleLogin} 
+        disabled={loginMutation.isPending}
+      />
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>Don't have an account? </Text>
