@@ -10,7 +10,7 @@ import DonorHomeScreen from '../screens/main/donor/DonorHomeScreen';
 import AddFoodScreen from '../screens/main/donor/AddFoodScreen';
 import VolunteerFeedScreen from '../screens/main/volunteer/VolunteerFeedScreen';
 import FoodDetailScreen from '../screens/main/FoodDetailScreen';
-import OngoingTaskScreen from '../screens/main/OngoingTaskScreen';
+import OngoingTaskScreen from '../screens/main/volunteer/OngoingTaskScreen';
 import VerificationScreen from '../screens/main/VerificationScreen';
 import ReceiverHomeScreen from '../screens/main/ReceiverHomeScreen';
 import HistoryScreen from '../screens/main/HistoryScreen';

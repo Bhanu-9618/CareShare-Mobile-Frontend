@@ -1,16 +1,42 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
-import { useApp } from '../../context/AppContext';
-import CustomButton from '../../components/CustomButton';
+import React, { useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useQuery } from '@tanstack/react-query';
+import CustomButton from '../../../components/CustomButton';
+import { volunteerService } from '../../../services/volunteerService';
+import { Donation } from '../../../services/commonService';
+import { COLORS } from '../../../constants/colors';
 
 export default function OngoingTaskScreen({ navigation }: any) {
-  const { user, foodList, updateFoodStatus } = useApp();
+  const { data: ongoingTasks = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ['ongoingTasks'],
+    queryFn: volunteerService.getOngoingTasks,
+  });
 
-  const activeTasks = foodList.filter(
-    (item) => item.currentVolunteerId === user?.id && item.status === 'Accepted'
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
   );
 
-  if (activeTasks.length === 0) {
+  if (isLoading) {
+    return (
+      <View style={styles.emptyContainer}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
+    );
+  }
+
+  if (isError) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>Failed to load tasks.</Text>
+        <CustomButton title="Retry" onPress={() => refetch()} />
+      </View>
+    );
+  }
+
+  if (ongoingTasks.length === 0) {
     return (
       <View style={styles.emptyContainer}>
         <Text style={styles.emptyText}>No ongoing tasks at the moment.</Text>
@@ -20,23 +46,24 @@ export default function OngoingTaskScreen({ navigation }: any) {
   }
 
   const handleNextStep = (taskId: string) => {
-    updateFoodStatus(taskId, 'Live', user?.id);
-    Alert.alert('Status Updated', 'Food item marked as Picked Up from the hotel!');
+    Alert.alert('Status Updated', 'Ready to connect the Picked Up API!');
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Ongoing Delivery Tasks</Text>
-      <Text style={styles.subtitle}>Track your progress ({activeTasks.length}/5).</Text>
+      <Text style={styles.subtitle}>Track your progress ({ongoingTasks.length}/5).</Text>
 
-      {activeTasks.map((activeTask) => (
-        <View key={activeTask.id} style={styles.taskWrapper}>
+      {ongoingTasks.map((activeTask: Donation) => (
+        <View key={activeTask.donationId} style={styles.taskWrapper}>
           <View style={styles.card}>
             <Text style={styles.foodName}>{activeTask.foodName}</Text>
             <Text style={styles.quantity}>Quantity: {activeTask.quantity}</Text>
-            <Text style={styles.hotelName}>From: {activeTask.hotelName}</Text>
-            <Text style={styles.addressText}>Address: {activeTask.address}</Text>
-            <Text style={styles.addressText}>To: Community Center - Colombo 03</Text>
+            
+            <View style={styles.locationContainer}>
+              <Text style={styles.locationLabel}>Pickup Location:</Text>
+              <Text style={styles.locationText}>{activeTask.location}</Text>
+            </View>
           </View>
 
           <View style={styles.timelineContainer}>
@@ -68,10 +95,10 @@ export default function OngoingTaskScreen({ navigation }: any) {
 
           <View style={{ marginTop: 20 }} />
 
-          {activeTask.status === 'Accepted' && (
+          {activeTask.status === 'ACCEPTED' && (
             <CustomButton
               title="Picked Up From Hotel"
-              onPress={() => handleNextStep(activeTask.id)}
+              onPress={() => handleNextStep(activeTask.donationId)}
             />
           )}
         </View>
@@ -130,20 +157,24 @@ const styles = StyleSheet.create({
     color: '#555555',
     marginBottom: 15,
   },
-  hotelName: {
-    fontSize: 14,
-    color: '#444444',
+  locationContainer: {
+    backgroundColor: '#eef2f7',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 5,
+    borderLeftWidth: 4,
+    borderLeftColor: '#007bff'
+  },
+  locationLabel: {
+    fontSize: 12,
+    color: '#666',
     fontWeight: '600',
     marginBottom: 2,
   },
-  addressText: {
-    fontSize: 13,
-    color: '#888888',
-    marginBottom: 2,
-  },
-  receiverName: {
-    fontSize: 14,
-    color: '#333333',
+  locationText: {
+    fontSize: 16,
+    color: '#1a1a1a',
+    fontWeight: 'bold',
   },
   timelineContainer: {
     backgroundColor: '#ffffff',
@@ -207,7 +238,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333333',
-    marginBottom: 5,
+    marginBottom: 15,
   },
   subEmptyText: {
     fontSize: 14,

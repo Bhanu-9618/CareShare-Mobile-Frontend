@@ -23,5 +23,15 @@ export const volunteerService = {
   claimDonation: async (donationId: string) => {
     const response = await axiosClient.post(`/volunteer/donations/${donationId}/claim`);
     return response.data;
+  },
+
+  getOngoingTasks: async (): Promise<Donation[]> => {
+    try {
+      const response = await axiosClient.get('/volunteer/tasks/ongoing');
+      return response.data;
+    } catch (error) {
+      console.error("ONGOING TASKS API ERROR: ", error);
+      throw error;
+    }
   }
 };
