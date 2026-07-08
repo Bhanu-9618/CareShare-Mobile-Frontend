@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useApp } from '../../context/AppContext';
-import { COLORS } from '../../constants/colors';
+import { useApp } from '../../../context/AppContext';
+import { COLORS } from '../../../constants/colors';
 import { useQuery } from '@tanstack/react-query';
-import { donorService } from '../../services/donorService';
-import { Donation } from '../../services/commonService';
+import { donorService } from '../../../services/donorService';
+import { Donation } from '../../../services/commonService';
 
 export default function DonorHomeScreen() {
   const { user } = useApp();

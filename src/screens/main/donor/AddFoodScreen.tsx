@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { useApp } from '../../context/AppContext';
-import CustomInput from '../../components/CustomInput';
-import CustomButton from '../../components/CustomButton';
-import { commonService } from '../../services/commonService';
-import { donorService } from '../../services/donorService';
+import { useApp } from '../../../context/AppContext';
+import CustomInput from '../../../components/CustomInput';
+import CustomButton from '../../../components/CustomButton';
+import { commonService } from '../../../services/commonService';
+import { donorService } from '../../../services/donorService';
 
 export default function AddFoodScreen({ navigation }: any) {
   const { user } = useApp();
