@@ -8,7 +8,7 @@ import SignUpScreen from '../screens/auth/SignUpScreen';
 import VerifyAccountScreen from '../screens/auth/VerifyAccountScreen';
 import DonorHomeScreen from '../screens/main/donor/DonorHomeScreen';
 import AddFoodScreen from '../screens/main/donor/AddFoodScreen';
-import VolunteerFeedScreen from '../screens/main/VolunteerFeedScreen';
+import VolunteerFeedScreen from '../screens/main/volunteer/VolunteerFeedScreen';
 import FoodDetailScreen from '../screens/main/FoodDetailScreen';
 import OngoingTaskScreen from '../screens/main/OngoingTaskScreen';
 import VerificationScreen from '../screens/main/VerificationScreen';
