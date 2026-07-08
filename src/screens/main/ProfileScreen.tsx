@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
 import { useMutation } from '@tanstack/react-query';
-import { userService } from '../../services/userService';
+import { commonService } from '../../services/commonService';
 
 export default function ProfileScreen() {
   const { user, logout, updateProfile } = useApp();
@@ -14,7 +14,7 @@ export default function ProfileScreen() {
   const [errors, setErrors] = useState<any>({});
 
   const updateMutation = useMutation({
-    mutationFn: userService.updateProfile,
+    mutationFn: commonService.updateProfile,
     onSuccess: () => {
       // Update global context so the UI reflects the new name/address immediately
       updateProfile(name, address);

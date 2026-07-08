@@ -4,7 +4,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useApp } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
 import { useQuery } from '@tanstack/react-query';
-import { donorService, Donation } from '../../services/donorService';
+import { donorService } from '../../services/donorService';
+import { Donation } from '../../services/commonService';
 
 export default function DonorHomeScreen() {
   const { user } = useApp();

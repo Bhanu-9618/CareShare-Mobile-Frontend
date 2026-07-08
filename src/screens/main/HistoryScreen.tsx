@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator } from 'reac
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
 import { useQuery } from '@tanstack/react-query';
-import { donorService, Donation } from '../../services/donorService';
+import { commonService, Donation } from '../../services/commonService';
 
 export default function HistoryScreen() {
   const { data: historyLogs = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['donationHistory'],
-    queryFn: donorService.getHistory,
+    queryFn: commonService.getHistory,
   });
 
   console.log("HISTORY LOGS FETCHED: ", historyLogs);

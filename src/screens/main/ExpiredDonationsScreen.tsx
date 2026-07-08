@@ -3,12 +3,12 @@ import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator } from 'reac
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
 import { useQuery } from '@tanstack/react-query';
-import { donorService, Donation } from '../../services/donorService';
+import { commonService, Donation } from '../../services/commonService';
 
 export default function ExpiredDonationsScreen() {
   const { data: expiredLogs = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['expiredDonations'],
-    queryFn: donorService.getExpiredDonations,
+    queryFn: commonService.getExpiredDonations,
   });
 
   useFocusEffect(
