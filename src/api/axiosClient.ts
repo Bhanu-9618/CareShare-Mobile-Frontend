@@ -1,6 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_BASE_URL } from '@env';
+import { DeviceEventEmitter } from 'react-native';
 
 const axiosClient = axios.create({
   baseURL: API_BASE_URL,
@@ -32,10 +33,9 @@ axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response && error.response.status === 401) {
-      // Logic to force logout user when token expires.
-      // Usually, you might dispatch a Redux action or call a Context method here,
-      // or clear AsyncStorage and navigate to the Login screen.
+      // Force global logout on token expiration
       await AsyncStorage.removeItem('userToken');
+      DeviceEventEmitter.emit('auth_error');
       console.warn('Unauthorized! Logging out user.');
     }
     return Promise.reject(error);

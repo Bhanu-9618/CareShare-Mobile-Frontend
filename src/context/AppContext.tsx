@@ -1,5 +1,8 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { DeviceEventEmitter } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService } from '../services/authService';
+import { decodeJwt } from '../utils/jwtUtils';
 
 export interface User {
   id: string;
@@ -83,6 +86,46 @@ export const getExpiryDisplay = (isoString: string) => {
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [foodList, setFoodList] = useState<FoodItem[]>(initialFoodItems);
+
+  useEffect(() => {
+    // 1. Auto-login on app start
+    const checkUserToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('userToken');
+        if (token) {
+          const decoded = decodeJwt(token);
+          if (decoded) {
+            // Check if token is physically expired right now
+            const isExpired = decoded.exp ? (decoded.exp * 1000) < Date.now() : false;
+            
+            if (isExpired) {
+              await AsyncStorage.removeItem('userToken');
+            } else {
+              setUser({
+                id: decoded.sub || 'unknown',
+                name: decoded.name || decoded.email?.split('@')[0] || 'User',
+                email: decoded.email || '',
+                role: (decoded['custom:role'] || 'Donor') as any,
+                address: 'Unknown'
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Error auto-logging in", e);
+      }
+    };
+    checkUserToken();
+
+    // 2. Global listener for 401 Unauthorized API responses
+    const authListener = DeviceEventEmitter.addListener('auth_error', () => {
+      setUser(null);
+    });
+
+    return () => {
+      authListener.remove();
+    };
+  }, []);
   const register = () => {
     return { success: true, message: 'Account created successfully!' };
   };
