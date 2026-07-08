@@ -101,11 +101,15 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
             if (isExpired) {
               await AsyncStorage.removeItem('userToken');
             } else {
+              let tokenRole = decoded['custom:role'] || 'Donor';
+              // Normalize casing so 'DONOR' becomes 'Donor', 'volunteer' becomes 'Volunteer'
+              tokenRole = tokenRole.charAt(0).toUpperCase() + tokenRole.slice(1).toLowerCase();
+              
               setUser({
                 id: decoded.sub || 'unknown',
                 name: decoded.name || decoded.email?.split('@')[0] || 'User',
                 email: decoded.email || '',
-                role: (decoded['custom:role'] || 'Donor') as any,
+                role: tokenRole as any,
                 address: 'Unknown'
               });
             }
