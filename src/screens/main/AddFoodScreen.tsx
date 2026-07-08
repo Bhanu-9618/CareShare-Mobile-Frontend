@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Image } from 'react-native';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useApp } from '../../context/AppContext';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
 
 export default function AddFoodScreen({ navigation }: any) {
-  const { addFoodItem, user } = useApp();
+  const { user } = useApp();
 
   const [foodName, setFoodName] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -14,14 +15,23 @@ export default function AddFoodScreen({ navigation }: any) {
   const [errors, setErrors] = useState<any>({});
 
   const handleSelectImage = () => {
-    // Mock image selection since we haven't installed an image picker library yet.
-    // In a real scenario, you'd use react-native-image-picker here.
     Alert.alert(
-      'Select Image',
-      'For now, this will attach a sample food image.',
+      'Upload Photo',
+      'Choose a method',
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Attach Sample', onPress: () => setImageUri('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=60') },
+        { 
+          text: 'Take Photo', 
+          onPress: () => launchCamera({ mediaType: 'photo', quality: 0.8 }, (res) => {
+            if (res.assets && res.assets.length > 0) setImageUri(res.assets[0].uri || null);
+          }) 
+        },
+        { 
+          text: 'Choose from Gallery', 
+          onPress: () => launchImageLibrary({ mediaType: 'photo', quality: 0.8 }, (res) => {
+            if (res.assets && res.assets.length > 0) setImageUri(res.assets[0].uri || null);
+          }) 
+        },
+        { text: 'Cancel', style: 'cancel' }
       ]
     );
   };
@@ -56,20 +66,10 @@ export default function AddFoodScreen({ navigation }: any) {
       expiryDate.setHours(expiryDate.getHours() + parseInt(expiryTime, 10));
       const isoExpiryString = expiryDate.toISOString();
 
-      addFoodItem(foodName, quantity, isoExpiryString, imageUri || undefined);
+      // TODO: Call donorService.postDonation API here
+      console.log('Posting donation:', { foodName, quantity, isoExpiryString, imageUri });
 
-      Alert.alert('Success', 'Donation posted successfully!', [
-        {
-          text: 'OK',
-          onPress: () => {
-            setFoodName('');
-            setQuantity('');
-            setExpiryTime('');
-            setImageUri(null);
-            navigation.navigate('Donor Home');
-          },
-        },
-      ]);
+      Alert.alert('Ready to Connect', 'The mock logic is removed. We are ready to wire this up to the backend!');
     }
   };
 

@@ -37,7 +37,6 @@ interface AppContextType {
   register: () => { success: boolean; message: string };
   login: (userData: User) => void;
   logout: () => void;
-  addFoodItem: (foodName: string, quantity: string, expiryTime: string, image?: string) => void;
   updateFoodStatus: (
     foodId: string,
     status: FoodItem['status'],
@@ -97,23 +96,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   };
 
-  const addFoodItem = (foodName: string, quantity: string, expiryTime: string, image?: string) => {
-    const newItem: FoodItem = {
-      id: Date.now().toString(),
-      foodName,
-      hotelName: user?.name || 'Partner Hotel',
-      quantity,
-      expiryTime,
-      address: user?.address || 'Unknown Address',
-      image: image || undefined,
-      status: 'Active',
-      currentVolunteerId: null,
-      assignedReceiverId: null,
-      generatedOtp: null,
-    };
-    setFoodList((prev) => [newItem, ...prev]);
-  };
-
   const updateFoodStatus = (
     foodId: string,
     status: FoodItem['status'],
@@ -144,7 +126,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AppContext.Provider value={{ user, foodList, register, login, logout, addFoodItem, updateFoodStatus, updateProfile }}>
+    <AppContext.Provider value={{ user, foodList, register, login, logout, updateFoodStatus, updateProfile }}>
       {children}
     </AppContext.Provider>
   );
