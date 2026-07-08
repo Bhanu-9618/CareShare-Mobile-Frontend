@@ -19,6 +19,11 @@ export const commonService = {
     return response.data;
   },
 
+  getUploadUrl: async (filename: string) => {
+    const response = await axiosClient.get(`/upload-url?filename=${encodeURIComponent(filename)}`);
+    return response.data;
+  },
+
   expireDonations: async () => {
     const response = await axiosClient.post('/receiver/donations/expire');
     return response.data;

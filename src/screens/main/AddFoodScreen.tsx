@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useApp } from '../../context/AppContext';
 import CustomInput from '../../components/CustomInput';
 import CustomButton from '../../components/CustomButton';
+import { commonService } from '../../services/commonService';
+import { donorService } from '../../services/donorService';
 
 export default function AddFoodScreen({ navigation }: any) {
   const { user } = useApp();
@@ -12,6 +14,7 @@ export default function AddFoodScreen({ navigation }: any) {
   const [quantity, setQuantity] = useState('');
   const [expiryTime, setExpiryTime] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [errors, setErrors] = useState<any>({});
 
   const handleSelectImage = () => {
@@ -36,7 +39,7 @@ export default function AddFoodScreen({ navigation }: any) {
     );
   };
 
-  const handlePostDonation = () => {
+  const handlePostDonation = async () => {
     let valid = true;
     let localErrors: any = {};
 
@@ -58,18 +61,61 @@ export default function AddFoodScreen({ navigation }: any) {
       valid = false;
     }
 
+    if (!imageUri) {
+      Alert.alert('Error', 'Please select an image first.');
+      return;
+    }
+
     setErrors(localErrors);
 
     if (valid) {
-      // Calculate future expiry time based on hours inputted
-      const expiryDate = new Date();
-      expiryDate.setHours(expiryDate.getHours() + parseInt(expiryTime, 10));
-      const isoExpiryString = expiryDate.toISOString();
+      setIsUploading(true);
+      try {
+        // Step 1: Get S3 Upload URL
+        const filename = imageUri.split('/').pop() || 'image.jpg';
+        const { uploadUrl, imageKey } = await commonService.getUploadUrl(filename);
 
-      // TODO: Call donorService.postDonation API here
-      console.log('Posting donation:', { foodName, quantity, isoExpiryString, imageUri });
+        // Step 2: Upload raw image binary to S3
+        const imageResponse = await fetch(imageUri);
+        const blob = await imageResponse.blob();
 
-      Alert.alert('Ready to Connect', 'The mock logic is removed. We are ready to wire this up to the backend!');
+        const s3Response = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: blob,
+        });
+
+        if (!s3Response.ok) {
+          throw new Error('Failed to upload image to S3');
+        }
+
+        // Step 3: Call Create Donation API
+        const expiryDate = new Date();
+        expiryDate.setHours(expiryDate.getHours() + parseInt(expiryTime, 10));
+        const isoExpiryString = expiryDate.toISOString();
+
+        await donorService.postDonation({
+          foodName: foodName.trim(),
+          quantity: quantity.trim(),
+          location: user?.address || 'Hotel Location',
+          expiryTime: isoExpiryString,
+          imageKey: imageKey
+        });
+
+        Alert.alert('Success', 'Donation posted successfully!');
+        
+        // Reset form
+        setFoodName('');
+        setQuantity('');
+        setExpiryTime('');
+        setImageUri(null);
+        setErrors({});
+        
+      } catch (error: any) {
+        console.error("POST DONATION ERROR:", error);
+        Alert.alert('Error', 'Failed to post donation. Please try again.');
+      } finally {
+        setIsUploading(false);
+      }
     }
   };
 
@@ -114,7 +160,11 @@ export default function AddFoodScreen({ navigation }: any) {
 
       <View style={{ marginTop: 20 }} />
 
-      <CustomButton title="Post Donation" onPress={handlePostDonation} />
+      <CustomButton 
+        title={isUploading ? "Uploading..." : "Post Donation"} 
+        onPress={handlePostDonation} 
+        disabled={isUploading} 
+      />
     </ScrollView>
   );
 }

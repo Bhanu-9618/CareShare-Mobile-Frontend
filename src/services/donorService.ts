@@ -16,8 +16,8 @@ export const donorService = {
     return response.data;
   },
 
-  postDonation: async (data: any) => {
-    // const response = await axiosClient.post('/donations', data);
-    // return response.data;
+  postDonation: async (data: { foodName: string; quantity: string; location: string; expiryTime: string; imageKey: string }) => {
+    const response = await axiosClient.post('/donor/donations', data);
+    return response.data;
   }
 };
