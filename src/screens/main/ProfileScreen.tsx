@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useApp } from '../../context/AppContext';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
+import { useMutation } from '@tanstack/react-query';
+import { userService } from '../../services/userService';
 
 export default function ProfileScreen() {
   const { user, logout, updateProfile } = useApp();
@@ -10,6 +12,19 @@ export default function ProfileScreen() {
   const [name, setName] = useState(user?.name || '');
   const [address, setAddress] = useState(user?.address || '');
   const [errors, setErrors] = useState<any>({});
+
+  const updateMutation = useMutation({
+    mutationFn: userService.updateProfile,
+    onSuccess: () => {
+      // Update global context so the UI reflects the new name/address immediately
+      updateProfile(name, address);
+      Alert.alert('Success', 'Profile updated successfully!');
+    },
+    onError: (error: any) => {
+      const msg = error.response?.data?.message || 'Failed to update profile.';
+      Alert.alert('Error', msg);
+    }
+  });
 
   const handleUpdate = () => {
     let valid = true;
@@ -27,8 +42,24 @@ export default function ProfileScreen() {
     setErrors(localErrors);
 
     if (valid) {
-      updateProfile(name, address);
-      Alert.alert('Success', 'Profile updated successfully!');
+      const payload: any = {};
+      let hasChanges = false;
+
+      if (name.trim() !== user?.name) {
+        payload.name = name.trim();
+        hasChanges = true;
+      }
+      if (address.trim() !== user?.address) {
+        payload.address = address.trim();
+        hasChanges = true;
+      }
+
+      if (!hasChanges) {
+        Alert.alert('No Changes', 'You have not changed your name or address.');
+        return;
+      }
+
+      updateMutation.mutate(payload);
     }
   };
 
@@ -62,7 +93,11 @@ export default function ProfileScreen() {
         />
         
         <View style={{ marginTop: 10 }} />
-        <CustomButton title="Update Profile" onPress={handleUpdate} />
+        <CustomButton 
+          title={updateMutation.isPending ? "Updating..." : "Update Profile"} 
+          onPress={handleUpdate} 
+          disabled={updateMutation.isPending}
+        />
       </View>
 
       <View style={styles.logoutContainer}>
