@@ -1,38 +1,55 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
-import { useApp, FoodItem, getExpiryDisplay } from '../../context/AppContext';
+import React, { useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useApp } from '../../context/AppContext';
 import { COLORS } from '../../constants/colors';
+import { useQuery } from '@tanstack/react-query';
+import { donorService, Donation } from '../../services/donorService';
 
 export default function DonorHomeScreen() {
-  const { foodList, user } = useApp();
+  const { user } = useApp();
 
-  const activeDonations = foodList.filter((item) => item.status !== 'Completed');
+  const { data: donations = [], isLoading, isError, error, refetch } = useQuery({
+    queryKey: ['donorDonations'],
+    queryFn: donorService.getDonations,
+  });
 
-  const getStatusColor = (status: FoodItem['status']) => {
-    switch (status) {
-      case 'Active': return '#007bff';
-      case 'Accepted': return '#ffc107';
-      case 'Completed': return COLORS.primary || 'green';
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
+
+  const activeDonations = donations.filter((item) => item.status !== 'COMPLETED');
+
+  const getStatusColor = (status: string) => {
+    switch (status?.toUpperCase()) {
+      case 'ACTIVE': return '#007bff';
+      case 'ACCEPTED': return '#ffc107';
+      case 'COMPLETED': return COLORS.primary || 'green';
       default: return '#6c757d';
     }
   };
 
-  const renderFoodCard = ({ item }: { item: FoodItem }) => (
+  const getExpiryText = (epochSeconds: number) => {
+    const diffMs = (epochSeconds * 1000) - Date.now();
+    if (diffMs <= 0) return 'Expired';
+    const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
+    return `In ${diffHours} Hour${diffHours === 1 ? '' : 's'}`;
+  };
+
+  const renderFoodCard = ({ item }: { item: Donation }) => (
     <View style={styles.card}>
       <Image
-        source={{ uri: item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c' }}
+        source={{ uri: item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c' }}
         style={styles.image}
       />
       <View style={styles.detailsContainer}>
         <Text style={styles.foodName}>{item.foodName}</Text>
-        <Text style={styles.hotelName}>{item.hotelName}</Text>
-        <Text style={styles.addressText}>{item.address}</Text>
+        <Text style={styles.addressText}>{item.location}</Text>
         <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
-        {item.currentVolunteerId && (
-          <Text style={styles.volunteerText}>Accepted by: {item.currentVolunteerId}</Text>
-        )}
         <View style={styles.expiryRow}>
-          <Text style={styles.expiry}>Expires: {getExpiryDisplay(item.expiryTime)}</Text>
+          <Text style={styles.expiry}>Expires: {getExpiryText(item.expiryAt)}</Text>
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.status) }]}>
             <Text style={styles.statusText}>{item.status}</Text>
           </View>
@@ -50,18 +67,26 @@ export default function DonorHomeScreen() {
 
       <Text style={styles.sectionTitle}>Your Donations</Text>
 
-      <FlatList
-        data={activeDonations}
-        keyExtractor={(item) => item.id}
-        renderItem={renderFoodCard}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No food donations posted yet.</Text>
-          </View>
-        }
-      />
+      {isLoading ? (
+        <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 40 }} />
+      ) : isError ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Failed to load donations. Pull to refresh.</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={activeDonations}
+          keyExtractor={(item) => item.donationId}
+          renderItem={renderFoodCard}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No food donations posted yet.</Text>
+            </View>
+          }
+        />
+      )}
     </View>
   );
 }

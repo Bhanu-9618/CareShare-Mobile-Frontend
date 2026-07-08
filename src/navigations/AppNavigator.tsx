@@ -19,6 +19,7 @@ import ReceiverLiveFeedScreen from '../screens/main/ReceiverLiveFeedScreen';
 import ReceiverRequestsScreen from '../screens/main/ReceiverRequestsScreen';
 import AdvancedVerificationScreen from '../screens/main/AdvancedVerificationScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
+import ExpiredDonationsScreen from '../screens/main/ExpiredDonationsScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -29,6 +30,7 @@ function DonorTabs() {
       <Tab.Screen name="Donor Home" component={DonorHomeScreen} />
       <Tab.Screen name="Post Food" component={AddFoodScreen} />
       <Tab.Screen name="History Log" component={HistoryScreen} />
+      <Tab.Screen name="Expired" component={ExpiredDonationsScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
@@ -41,6 +43,7 @@ function VolunteerTabs() {
       <Tab.Screen name="My Inventory" component={VolunteerInventoryScreen} />
       <Tab.Screen name="My Task" component={OngoingTaskScreen} />
       <Tab.Screen name="History Log" component={HistoryScreen} />
+      <Tab.Screen name="Expired" component={ExpiredDonationsScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

@@ -5,17 +5,14 @@ import { COLORS } from '../../constants/colors';
 import { useQuery } from '@tanstack/react-query';
 import { donorService, Donation } from '../../services/donorService';
 
-export default function HistoryScreen() {
-  const { data: historyLogs = [], isLoading, isError, refetch } = useQuery({
-    queryKey: ['donationHistory'],
-    queryFn: donorService.getHistory,
+export default function ExpiredDonationsScreen() {
+  const { data: expiredLogs = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ['expiredDonations'],
+    queryFn: donorService.getExpiredDonations,
   });
-
-  console.log("HISTORY LOGS FETCHED: ", historyLogs);
 
   useFocusEffect(
     useCallback(() => {
-      console.log("History screen focused, refetching API...");
       refetch();
     }, [refetch])
   );
@@ -59,25 +56,25 @@ export default function HistoryScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Donation History</Text>
-      <Text style={styles.subtitle}>Log of all food distributions and logs.</Text>
+      <Text style={styles.title}>Expired Donations</Text>
+      <Text style={styles.subtitle}>Log of expired food that couldn't be distributed.</Text>
 
       {isLoading ? (
         <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 40 }} />
       ) : isError ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Failed to load history. Pull to refresh.</Text>
+          <Text style={styles.emptyText}>Failed to load expired donations. Pull to refresh.</Text>
         </View>
       ) : (
         <FlatList
-          data={historyLogs}
+          data={expiredLogs}
           keyExtractor={(item) => item.donationId}
           renderItem={renderHistoryCard}
           contentContainerStyle={styles.listContainer}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No logs found in the registry.</Text>
+              <Text style={styles.emptyText}>No expired donations found.</Text>
             </View>
           }
         />
