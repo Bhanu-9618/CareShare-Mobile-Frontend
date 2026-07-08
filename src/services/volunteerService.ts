@@ -18,5 +18,10 @@ export const volunteerService = {
       console.error("VOLUNTEER FEED API ERROR: ", error);
       throw error;
     }
+  },
+
+  claimDonation: async (donationId: string) => {
+    const response = await axiosClient.post(`/volunteer/donations/${donationId}/claim`);
+    return response.data;
   }
 };

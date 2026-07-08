@@ -1,15 +1,16 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, Alert } from 'react-native';
-import { useApp } from '../../context/AppContext';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import CustomButton from '../../components/CustomButton';
+import { Donation } from '../../services/commonService';
+import { volunteerService } from '../../services/volunteerService';
+import { COLORS } from '../../constants/colors';
 
 export default function FoodDetailScreen({ route, navigation }: any) {
-  const { foodId } = route.params;
-  const { foodList, updateFoodStatus, user } = useApp();
+  const [isClaiming, setIsClaiming] = useState(false);
+  // We passed the entire donation object directly from the feed card!
+  const donation: Donation = route.params?.donation;
 
-  const foodItem = foodList.find((item) => item.id === foodId);
-
-  if (!foodItem) {
+  if (!donation) {
     return (
       <View style={styles.errorContainer}>
         <Text style={styles.errorText}>Food item not found!</Text>
@@ -17,70 +18,74 @@ export default function FoodDetailScreen({ route, navigation }: any) {
     );
   }
 
-  const handleClaimDonation = () => {
-    const ongoingTasksCount = foodList.filter(
-      (item) => item.currentVolunteerId === user?.id && item.status === 'Accepted'
-    ).length;
+  const getExpiryText = (epochSeconds: number) => {
+    const diffMs = (epochSeconds * 1000) - Date.now();
+    if (diffMs <= 0) return 'Expired';
+    const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
+    return `In ${diffHours} Hour${diffHours === 1 ? '' : 's'}`;
+  };
 
-    if (ongoingTasksCount >= 5) {
-      Alert.alert(
-        'Limit Reached',
-        'You already have 5 ongoing tasks. Please pick up and deliver them before claiming new donations.'
-      );
-      return;
-    }
-
-    updateFoodStatus(foodId, 'Accepted', user?.id);
-
-    Alert.alert('Success', 'You have successfully claimed this donation!', [
-      {
-        text: 'OK',
-        onPress: () => {
-          navigation.navigate('MainTabs');
+  const handleClaimDonation = async () => {
+    try {
+      setIsClaiming(true);
+      const res = await volunteerService.claimDonation(donation.donationId);
+      
+      // Use the exact message from the backend response as requested
+      Alert.alert('Success', res.message, [
+        {
+          text: 'OK',
+          onPress: () => {
+            navigation.goBack(); // Navigating back will auto-trigger refetch on the Feed via useFocusEffect
+          },
         },
-      },
-    ]);
+      ]);
+    } catch (error: any) {
+      console.error("CLAIM ERROR: ", error);
+      // If user exceeds 5 limits, the backend throws an error message
+      const errorMsg = error.response?.data?.message || 'Failed to claim donation.';
+      Alert.alert('Error', errorMsg);
+    } finally {
+      setIsClaiming(false);
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Image
-        source={{ uri: foodItem.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c' }}
+        source={{ uri: donation.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c' }}
         style={styles.image}
       />
 
       <View style={styles.infoContainer}>
-        <Text style={styles.foodName}>{foodItem.foodName}</Text>
-        <Text style={styles.hotelName}>Provided by: {foodItem.hotelName}</Text>
-        <Text style={styles.addressText}>Location: {foodItem.address}</Text>
+        <Text style={styles.foodName}>{donation.foodName}</Text>
+        <Text style={styles.addressText}>Location: {donation.location}</Text>
 
         <View style={styles.divider} />
 
         <View style={styles.row}>
           <Text style={styles.label}>Quantity:</Text>
-          <Text style={styles.value}>{foodItem.quantity}</Text>
+          <Text style={styles.value}>{donation.quantity}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Expiry Time:</Text>
-          <Text style={styles.valueColor}>{foodItem.expiryTime}</Text>
-        </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>Pickup Location:</Text>
-          <Text style={styles.value}>Colombo, Sri Lanka</Text>
+          <Text style={styles.valueColor}>{getExpiryText(donation.expiryAt)}</Text>
         </View>
 
         <View style={styles.divider} />
 
         <Text style={styles.descriptionTitle}>Important Note:</Text>
         <Text style={styles.descriptionText}>
-          Please ensure you have an insulated thermal bag to maintain food safety standards during transit. Arrive at the hotel location as soon as possible.
+          Please ensure you have an insulated thermal bag to maintain food safety standards during transit. Arrive at the location as soon as possible.
         </Text>
 
         <View style={{ marginTop: 30 }} />
 
-        <CustomButton title="Claim Donation" onPress={handleClaimDonation} />
+        <CustomButton 
+          title={isClaiming ? "Claiming..." : "Claim Donation"} 
+          onPress={handleClaimDonation} 
+          disabled={isClaiming}
+        />
       </View>
     </ScrollView>
   );
@@ -107,11 +112,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333333',
-  },
-  hotelName: {
-    fontSize: 16,
-    color: '#444444',
-    fontWeight: '600',
     marginBottom: 4,
   },
   addressText: {
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   },
   valueColor: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: 'bold',
     color: '#dc3545',
   },
   descriptionTitle: {

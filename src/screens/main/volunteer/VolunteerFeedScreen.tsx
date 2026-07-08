@@ -43,7 +43,7 @@ export default function VolunteerFeedScreen({ navigation }: any) {
   const renderFeedCard = ({ item }: { item: Donation }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('FoodDetail', { foodId: item.donationId })}
+      onPress={() => navigation.navigate('FoodDetail', { donation: item })}
     >
       <Image
         source={{ uri: item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c' }}
