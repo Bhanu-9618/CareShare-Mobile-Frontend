@@ -19,7 +19,7 @@ axiosClient.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     } catch (e) {
-      console.error('Error fetching token from AsyncStorage', e);
+      // Ignore token fetch errors
     }
     return config;
   },
@@ -36,7 +36,6 @@ axiosClient.interceptors.response.use(
       // Force global logout on token expiration
       await AsyncStorage.removeItem('userToken');
       DeviceEventEmitter.emit('auth_error');
-      console.warn('Unauthorized! Logging out user.');
     }
     return Promise.reject(error);
   }

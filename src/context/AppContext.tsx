@@ -38,6 +38,7 @@ export interface FoodItem {
 interface AppContextType {
   user: User | null;
   foodList: FoodItem[];
+  isLoading: boolean;
   register: () => { success: boolean; message: string };
   login: (userData: User) => void;
   logout: () => void;
@@ -87,6 +88,7 @@ export const getExpiryDisplay = (isoString: string) => {
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [foodList, setFoodList] = useState<FoodItem[]>(initialFoodItems);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     // 1. Auto-login on app start
@@ -117,7 +119,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           }
         }
       } catch (e) {
-        console.error("Error auto-logging in", e);
+        // Failed to auto-login
+      } finally {
+        setIsLoading(false);
       }
     };
     checkUserToken();
@@ -174,7 +178,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AppContext.Provider value={{ user, foodList, register, login, logout, updateFoodStatus, updateProfile }}>
+    <AppContext.Provider value={{ user, foodList, isLoading, register, login, logout, updateFoodStatus, updateProfile }}>
       {children}
     </AppContext.Provider>
   );

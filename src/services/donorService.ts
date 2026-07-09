@@ -7,7 +7,6 @@ export const donorService = {
     try {
       await commonService.expireDonations();
     } catch (e) {
-      console.warn("Failed to expire donations:", e);
       // We catch this so it doesn't break the whole app if expire endpoint has a hiccup
     }
     

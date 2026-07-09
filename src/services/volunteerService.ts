@@ -7,7 +7,7 @@ export const volunteerService = {
     try {
       await commonService.expireDonations();
     } catch (e) {
-      console.warn("Failed to expire donations in volunteer feed:", e);
+      // Failed to expire donations
     }
 
     // 2. Fetch the fresh feed
@@ -15,7 +15,6 @@ export const volunteerService = {
       const response = await axiosClient.get('/volunteer/feed');
       return response.data;
     } catch (error) {
-      console.error("VOLUNTEER FEED API ERROR: ", error);
       throw error;
     }
   },
@@ -30,7 +29,6 @@ export const volunteerService = {
       const response = await axiosClient.get('/volunteer/tasks/ongoing');
       return response.data;
     } catch (error) {
-      console.error("ONGOING TASKS API ERROR: ", error);
       throw error;
     }
   },
@@ -45,7 +43,6 @@ export const volunteerService = {
       const response = await axiosClient.get('/volunteer/inventory');
       return response.data;
     } catch (error) {
-      console.error("INVENTORY API ERROR: ", error);
       throw error;
     }
   },

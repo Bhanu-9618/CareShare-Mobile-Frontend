@@ -38,10 +38,8 @@ export const commonService = {
   getHistory: async (): Promise<Donation[]> => {
     try {
       const response = await axiosClient.get('/donations/history');
-      console.log("RAW HISTORY RESPONSE: ", response.data);
       return response.data;
     } catch (error) {
-      console.error("HISTORY API ERROR: ", error);
       throw error;
     }
   },
@@ -49,10 +47,8 @@ export const commonService = {
   getExpiredDonations: async (): Promise<Donation[]> => {
     try {
       const response = await axiosClient.get('/donations/expired');
-      console.log("RAW EXPIRED RESPONSE: ", response.data);
       return response.data;
     } catch (error) {
-      console.error("EXPIRED API ERROR: ", error);
       throw error;
     }
   }

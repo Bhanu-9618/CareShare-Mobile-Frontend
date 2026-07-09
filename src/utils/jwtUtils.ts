@@ -43,7 +43,6 @@ export const decodeJwt = (token: string) => {
     );
     return JSON.parse(jsonPayload);
   } catch (e) {
-    console.error("JWT Decode error", e);
     return null;
   }
 };

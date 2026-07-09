@@ -11,11 +11,8 @@ export default function HistoryScreen() {
     queryFn: commonService.getHistory,
   });
 
-  console.log("HISTORY LOGS FETCHED: ", historyLogs);
-
   useFocusEffect(
     useCallback(() => {
-      console.log("History screen focused, refetching API...");
       refetch();
     }, [refetch])
   );

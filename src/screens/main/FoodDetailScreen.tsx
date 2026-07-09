@@ -40,8 +40,7 @@ export default function FoodDetailScreen({ route, navigation }: any) {
         },
       ]);
     } catch (error: any) {
-      console.error("CLAIM ERROR: ", error);
-      // If user exceeds 5 limits, the backend throws an error message
+      // Silent ignore on error, handle UI through alert
       const errorMsg = error.response?.data?.message || 'Failed to claim donation.';
       Alert.alert('Error', errorMsg);
     } finally {

@@ -7,7 +7,7 @@ export const receiverService = {
     try {
       await commonService.expireDonations();
     } catch (e) {
-      console.warn("Failed to expire donations in receiver feed:", e);
+      // Failed to expire donations
     }
 
     // 2. Fetch the fresh live feed
@@ -15,7 +15,6 @@ export const receiverService = {
       const response = await axiosClient.get('/receiver/live-feed');
       return response.data;
     } catch (error) {
-      console.error("RECEIVER LIVE FEED API ERROR: ", error);
       throw error;
     }
   },
@@ -30,7 +29,6 @@ export const receiverService = {
       const response = await axiosClient.get('/receiver/requests/pending');
       return response.data;
     } catch (error) {
-      console.error("RECEIVER PENDING REQUESTS API ERROR: ", error);
       throw error;
     }
   },
@@ -40,7 +38,6 @@ export const receiverService = {
       const response = await axiosClient.get('/receiver/hub');
       return response.data;
     } catch (error) {
-      console.error("RECEIVER HUB API ERROR: ", error);
       throw error;
     }
   }

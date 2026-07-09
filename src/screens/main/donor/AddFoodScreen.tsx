@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity, Image } from 'react-native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useApp } from '../../../context/AppContext';
 import CustomInput from '../../../components/CustomInput';
@@ -7,7 +7,7 @@ import CustomButton from '../../../components/CustomButton';
 import { commonService } from '../../../services/commonService';
 import { donorService } from '../../../services/donorService';
 
-export default function AddFoodScreen({ navigation }: any) {
+export default function AddFoodScreen({ _navigation }: any) {
   const { user } = useApp();
 
   const [foodName, setFoodName] = useState('');
@@ -73,7 +73,9 @@ export default function AddFoodScreen({ navigation }: any) {
       try {
         // Step 1: Get S3 Upload URL
         const filename = imageUri.split('/').pop() || 'image.jpg';
-        const { uploadUrl, imageKey } = await commonService.getUploadUrl(filename);
+        const uploadResponse: any = await commonService.getUploadUrl(filename);
+        const uploadUrl = uploadResponse.uploadUrl || uploadResponse;
+        const imageKey = uploadResponse.imageKey || filename;
 
         // Step 2: Upload raw image binary to S3
         const imageResponse = await fetch(imageUri);
@@ -111,7 +113,6 @@ export default function AddFoodScreen({ navigation }: any) {
         setErrors({});
         
       } catch (error: any) {
-        console.error("POST DONATION ERROR:", error);
         Alert.alert('Error', 'Failed to post donation. Please try again.');
       } finally {
         setIsUploading(false);
@@ -158,7 +159,7 @@ export default function AddFoodScreen({ navigation }: any) {
         )}
       </TouchableOpacity>
 
-      <View style={{ marginTop: 20 }} />
+      <View style={styles.spacer} />
 
       <CustomButton 
         title={isUploading ? "Uploading..." : "Post Donation"} 
@@ -216,4 +217,7 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'cover',
   },
+  spacer: {
+    marginTop: 20,
+  }
 });
