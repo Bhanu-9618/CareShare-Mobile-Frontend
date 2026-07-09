@@ -71,13 +71,11 @@ export default function AddFoodScreen({ _navigation }: any) {
     if (valid) {
       setIsUploading(true);
       try {
-        // Step 1: Get S3 Upload URL
         const filename = imageUri.split('/').pop() || 'image.jpg';
         const uploadResponse: any = await commonService.getUploadUrl(filename);
         const uploadUrl = uploadResponse.uploadUrl || uploadResponse;
         const imageKey = uploadResponse.imageKey || filename;
 
-        // Step 2: Upload raw image binary to S3
         const imageResponse = await fetch(imageUri);
         const blob = await imageResponse.blob();
 
@@ -90,7 +88,6 @@ export default function AddFoodScreen({ _navigation }: any) {
           throw new Error('Failed to upload image to S3');
         }
 
-        // Step 3: Call Create Donation API
         const expiryDate = new Date();
         expiryDate.setHours(expiryDate.getHours() + parseInt(expiryTime, 10));
         const isoExpiryString = expiryDate.toISOString();
@@ -105,7 +102,6 @@ export default function AddFoodScreen({ _navigation }: any) {
 
         Alert.alert('Success', 'Donation posted successfully!');
         
-        // Reset form
         setFoodName('');
         setQuantity('');
         setExpiryTime('');

@@ -7,7 +7,6 @@ import { COLORS } from '../../constants/colors';
 
 export default function FoodDetailScreen({ route, navigation }: any) {
   const [isClaiming, setIsClaiming] = useState(false);
-  // We passed the entire donation object directly from the feed card!
   const donation: Donation = route.params?.donation;
 
   if (!donation) {
@@ -30,17 +29,15 @@ export default function FoodDetailScreen({ route, navigation }: any) {
       setIsClaiming(true);
       const res = await volunteerService.claimDonation(donation.donationId);
       
-      // Use the exact message from the backend response as requested
       Alert.alert('Success', res.message, [
         {
           text: 'OK',
           onPress: () => {
-            navigation.goBack(); // Navigating back will auto-trigger refetch on the Feed via useFocusEffect
+            navigation.goBack(); 
           },
         },
       ]);
     } catch (error: any) {
-      // Silent ignore on error, handle UI through alert
       const errorMsg = error.response?.data?.message || 'Failed to claim donation.';
       Alert.alert('Error', errorMsg);
     } finally {

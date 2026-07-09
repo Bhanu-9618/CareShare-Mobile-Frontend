@@ -22,7 +22,6 @@ export default function ProfileScreen() {
     if (profile) {
       setName(profile.name || user?.name || '');
       setAddress(profile.address || user?.address || '');
-      // Optionally update the global context so the home screen gets the real address too
       updateProfile(profile.name, profile.address);
     }
   }, [profile]);
@@ -30,7 +29,6 @@ export default function ProfileScreen() {
   const updateMutation = useMutation({
     mutationFn: commonService.updateProfile,
     onSuccess: () => {
-      // Update global context so the UI reflects the new name/address immediately
       updateProfile(name, address);
       Alert.alert('Success', 'Profile updated successfully!');
     },

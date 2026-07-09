@@ -19,11 +19,11 @@ export default function SignUpScreen({ navigation }: any) {
   const registerMutation = useMutation({
     mutationFn: authService.register,
     onSuccess: (data) => {
-      // Navigate to verify account screen with the email we just registered
+
       navigation.navigate('VerifyAccount', { email });
     },
     onError: (error: any, variables: any) => {
-      // Handle the 400 Bad Request if email exists or other errors
+
       const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Registration Failed';
 
       if (errorMessage.toLowerCase().includes('already exist') || errorMessage.toLowerCase().includes('registered successfully')) {
@@ -50,7 +50,7 @@ export default function SignUpScreen({ navigation }: any) {
       valid = false;
     }
 
-    // Password rules: Min 8, 1 uppercase, 1 lowercase, 1 number, 1 symbol
+
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d\s]).{8,}$/;
     if (!passwordRegex.test(password)) {
       localErrors.password = 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one symbol';
@@ -144,7 +144,7 @@ export default function SignUpScreen({ navigation }: any) {
       <View style={styles.footer}>
         <Text style={styles.footerText}>Already have an account? </Text>
         <TouchableOpacity onPress={() => {
-          // Clear form when going to login
+
           setName('');
           setEmail('');
           setPassword('');

@@ -21,7 +21,6 @@ export default function VolunteerFeedScreen({ navigation }: any) {
     }, [refetch])
   );
 
-  // Filter for ACTIVE only
   const activeFoods = feedData.filter((item) => item.status === 'ACTIVE');
 
   const getStatusColor = (status: string) => {

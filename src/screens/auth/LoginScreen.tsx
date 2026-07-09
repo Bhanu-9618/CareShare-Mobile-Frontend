@@ -17,7 +17,7 @@ export default function LoginScreen({ navigation }: any) {
   const loginMutation = useMutation({
     mutationFn: () => authService.login(email, password),
     onSuccess: (data) => {
-      // Decode the IdToken to get the custom role and user details
+
       const idToken = data.IdToken || data.token;
       if (!idToken) {
         Alert.alert('Login Error', 'Failed to retrieve user token from server.');
@@ -30,9 +30,9 @@ export default function LoginScreen({ navigation }: any) {
         return;
       }
 
-      // Map the decoded token to our internal User object
+
       const roleStr = decoded['custom:role'] || 'Donor';
-      // Format role to Capitalized (e.g. "DONOR" -> "Donor")
+
       const formattedRole = roleStr.charAt(0).toUpperCase() + roleStr.slice(1).toLowerCase();
 
       login({
@@ -42,7 +42,7 @@ export default function LoginScreen({ navigation }: any) {
         role: formattedRole as 'Donor' | 'Volunteer' | 'Receiver',
         address: decoded.address?.formatted || 'Unknown Address',
       });
-      // Navigation is handled automatically by AppNavigator reacting to user state change
+
     },
     onError: (error: any) => {
       const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Login Failed';

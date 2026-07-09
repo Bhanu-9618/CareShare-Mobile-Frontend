@@ -3,14 +3,11 @@ import { commonService, Donation } from './commonService';
 
 export const volunteerService = {
   getFeed: async (): Promise<Donation[]> => {
-    // 1. Force backend to expire old donations first
     try {
       await commonService.expireDonations();
     } catch (e) {
-      // Failed to expire donations
     }
 
-    // 2. Fetch the fresh feed
     try {
       const response = await axiosClient.get('/volunteer/feed');
       return response.data;

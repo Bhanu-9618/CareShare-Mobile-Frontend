@@ -10,7 +10,7 @@ const axiosClient = axios.create({
   },
 });
 
-// Request Interceptor: Attach token if it exists
+
 axiosClient.interceptors.request.use(
   async (config) => {
     try {
@@ -19,7 +19,7 @@ axiosClient.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     } catch (e) {
-      // Ignore token fetch errors
+
     }
     return config;
   },
@@ -28,12 +28,12 @@ axiosClient.interceptors.request.use(
   }
 );
 
-// Response Interceptor: Handle global errors like 401 Unauthorized
+
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response && error.response.status === 401) {
-      // Force global logout on token expiration
+
       await AsyncStorage.removeItem('userToken');
       DeviceEventEmitter.emit('auth_error');
     }

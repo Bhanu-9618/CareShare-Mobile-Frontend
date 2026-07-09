@@ -60,17 +60,17 @@ export const getExpiryDisplay = (isoString: string) => {
   try {
     if (!isoString || typeof isoString !== 'string') return String(isoString);
 
-    // Manually parse ISO 8601 string to bypass any JS Engine Date parsing inconsistencies
-    // Format: "YYYY-MM-DDTHH:MM:SS.mmmZ"
+
+
     const match = isoString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
     
     if (!match) {
-      return isoString; // fallback if it's not our expected format
+      return isoString;
     }
 
     const [_, year, month, day, hours, minutes, seconds] = match;
     
-    // Create Date object using UTC constructor (100% reliable across all JS engines)
+
     const expiryDate = new Date(Date.UTC(+year, +month - 1, +day, +hours, +minutes, +seconds));
     
     if (isNaN(expiryDate.getTime())) return isoString;
@@ -91,21 +91,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    // 1. Auto-login on app start
+
     const checkUserToken = async () => {
       try {
         const token = await AsyncStorage.getItem('userToken');
         if (token) {
           const decoded = decodeJwt(token);
           if (decoded) {
-            // Check if token is physically expired right now
+
             const isExpired = decoded.exp ? (decoded.exp * 1000) < Date.now() : false;
             
             if (isExpired) {
               await AsyncStorage.removeItem('userToken');
             } else {
               let tokenRole = decoded['custom:role'] || 'Donor';
-              // Normalize casing so 'DONOR' becomes 'Donor', 'volunteer' becomes 'Volunteer'
+
               tokenRole = tokenRole.charAt(0).toUpperCase() + tokenRole.slice(1).toLowerCase();
               
               setUser({
@@ -119,14 +119,14 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
           }
         }
       } catch (e) {
-        // Failed to auto-login
+
       } finally {
         setIsLoading(false);
       }
     };
     checkUserToken();
 
-    // 2. Global listener for 401 Unauthorized API responses
+
     const authListener = DeviceEventEmitter.addListener('auth_error', () => {
       setUser(null);
     });

@@ -22,10 +22,10 @@ export const decodeJwt = (token: string) => {
     const base64Url = token.split('.')[1];
     if (!base64Url) return null;
     
-    // Replace non-url compatible chars with base64 standard chars
+
     let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     
-    // Pad out with standard base64 required padding characters
+
     const pad = base64.length % 4;
     if (pad) {
       if (pad === 1) {
@@ -34,7 +34,7 @@ export const decodeJwt = (token: string) => {
       base64 += new Array(5 - pad).join('=');
     }
     
-    // Use React Native's global atob to decode the base64 string
+
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split('')
