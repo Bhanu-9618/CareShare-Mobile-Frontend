@@ -3,7 +3,6 @@ import { DeviceEventEmitter } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService } from '../services/authService';
 import { decodeJwt } from '../utils/jwtUtils';
-import { commonService } from '../services/commonService';
 
 export interface User {
   id: string;
@@ -37,24 +36,14 @@ export interface FoodItem {
 
 interface AppContextType {
   user: User | null;
-  foodList: FoodItem[];
   isLoading: boolean;
   register: () => { success: boolean; message: string };
   login: (userData: User) => void;
   logout: () => void;
-  updateFoodStatus: (
-    foodId: string,
-    status: FoodItem['status'],
-    volunteerId?: string | null,
-    receiverId?: string | null,
-    otp?: string | null
-  ) => void;
   updateProfile: (name: string, address: string) => void;
 }
 
-const AppContext = createContext<AppContextType | undefined>(undefined);
-
-const initialFoodItems: FoodItem[] = [];
+export const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const getExpiryDisplay = (isoString: string) => {
   try {
@@ -87,7 +76,6 @@ export const getExpiryDisplay = (isoString: string) => {
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [foodList, setFoodList] = useState<FoodItem[]>(initialFoodItems);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -148,29 +136,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
   };
 
-  const updateFoodStatus = (
-    foodId: string,
-    status: FoodItem['status'],
-    volunteerId?: string | null,
-    receiverId?: string | null,
-    otp?: string | null
-  ) => {
-    setFoodList((prevList) =>
-      prevList.map((item) => {
-        if (item.id === foodId) {
-          const updatedItem = { ...item, status };
-
-          if (volunteerId !== undefined) updatedItem.currentVolunteerId = volunteerId;
-          if (receiverId !== undefined) updatedItem.assignedReceiverId = receiverId;
-          if (otp !== undefined) updatedItem.generatedOtp = otp;
-
-          return updatedItem;
-        }
-        return item;
-      })
-    );
-  };
-
   const updateProfile = (name: string, address: string) => {
     if (user) {
       setUser({ ...user, name, address });
@@ -178,7 +143,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AppContext.Provider value={{ user, foodList, isLoading, register, login, logout, updateFoodStatus, updateProfile }}>
+    <AppContext.Provider value={{ user, isLoading, register, login, logout, updateProfile }}>
       {children}
     </AppContext.Provider>
   );
