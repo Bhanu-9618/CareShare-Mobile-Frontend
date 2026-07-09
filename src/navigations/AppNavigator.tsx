@@ -16,7 +16,7 @@ import ReceiverHomeScreen from '../screens/main/ReceiverHomeScreen';
 import HistoryScreen from '../screens/main/HistoryScreen';
 import VolunteerInventoryScreen from '../screens/main/volunteer/VolunteerInventoryScreen';
 import ReceiverLiveFeedScreen from '../screens/main/receiver/ReceiverLiveFeedScreen';
-import ReceiverRequestsScreen from '../screens/main/ReceiverRequestsScreen';
+import ReceiverRequestsScreen from '../screens/main/receiver/ReceiverRequestsScreen';
 import AdvancedVerificationScreen from '../screens/main/AdvancedVerificationScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
 import ExpiredDonationsScreen from '../screens/main/ExpiredDonationsScreen';

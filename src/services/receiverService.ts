@@ -18,5 +18,20 @@ export const receiverService = {
       console.error("RECEIVER LIVE FEED API ERROR: ", error);
       throw error;
     }
+  },
+
+  requestDonation: async (donationId: string) => {
+    const response = await axiosClient.post(`/receiver/donations/${donationId}/request`);
+    return response.data;
+  },
+
+  getPendingRequests: async (): Promise<Donation[]> => {
+    try {
+      const response = await axiosClient.get('/receiver/requests/pending');
+      return response.data;
+    } catch (error) {
+      console.error("RECEIVER PENDING REQUESTS API ERROR: ", error);
+      throw error;
+    }
   }
 };

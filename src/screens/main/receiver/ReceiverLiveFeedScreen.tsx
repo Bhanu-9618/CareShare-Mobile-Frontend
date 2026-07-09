@@ -9,6 +9,7 @@ import { COLORS } from '../../../constants/colors';
 
 export default function ReceiverLiveFeedScreen() {
   const { user } = useApp();
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const { data: liveFoodItems = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['receiverLiveFeed'],
@@ -28,16 +29,26 @@ export default function ReceiverLiveFeedScreen() {
     return `In ${diffHours} Hour${diffHours === 1 ? '' : 's'}`;
   };
 
-  const handleRequestFood = (item: Donation) => {
+  const handleRequestFood = async (item: Donation) => {
     if (!user) {
       Alert.alert('Error', 'You must be logged in to request food.');
       return;
     }
 
-    Alert.alert(
-      'Ready to Connect',
-      `The Request Food API for "${item.foodName}" will be connected here once the backend endpoint is provided.`
-    );
+    try {
+      setIsProcessing(item.donationId);
+      const res = await receiverService.requestDonation(item.donationId);
+      Alert.alert(
+        'Request Submitted',
+        res.message || `Your request for "${item.foodName}" has been successfully sent to the volunteer.`,
+        [{ text: 'OK', onPress: () => refetch() }]
+      );
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Failed to request food donation.';
+      Alert.alert('Error', errorMsg);
+    } finally {
+      setIsProcessing(null);
+    }
   };
 
   const renderLiveItem = ({ item }: { item: Donation }) => (
@@ -58,8 +69,14 @@ export default function ReceiverLiveFeedScreen() {
         <Text style={styles.volunteerInfo}>🚴 Courier: Connected Volunteer</Text>
       </View>
 
-      <TouchableOpacity style={styles.requestButton} onPress={() => handleRequestFood(item)}>
-        <Text style={styles.buttonText}>Request Food Donation</Text>
+      <TouchableOpacity 
+        style={styles.requestButton} 
+        onPress={() => handleRequestFood(item)}
+        disabled={isProcessing === item.donationId}
+      >
+        <Text style={styles.buttonText}>
+          {isProcessing === item.donationId ? "Requesting..." : "Request Food Donation"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
