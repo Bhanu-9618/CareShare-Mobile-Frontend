@@ -3,15 +3,29 @@ import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 're
 import { useApp } from '../../context/AppContext';
 import CustomButton from '../../components/CustomButton';
 import CustomInput from '../../components/CustomInput';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { commonService } from '../../services/commonService';
 
 export default function ProfileScreen() {
   const { user, logout, updateProfile } = useApp();
   
-  const [name, setName] = useState(user?.name || '');
-  const [address, setAddress] = useState(user?.address || '');
-  const [errors, setErrors] = useState<any>({});
+  const [name, setName] = React.useState(user?.name || '');
+  const [address, setAddress] = React.useState(user?.address || '');
+  const [errors, setErrors] = React.useState<any>({});
+
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ['profileData'],
+    queryFn: commonService.getProfile,
+  });
+
+  React.useEffect(() => {
+    if (profile) {
+      setName(profile.name || user?.name || '');
+      setAddress(profile.address || user?.address || '');
+      // Optionally update the global context so the home screen gets the real address too
+      updateProfile(profile.name, profile.address);
+    }
+  }, [profile]);
 
   const updateMutation = useMutation({
     mutationFn: commonService.updateProfile,
@@ -67,12 +81,18 @@ export default function ProfileScreen() {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.profileCard}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{user?.name?.charAt(0).toUpperCase() || '?'}</Text>
+          <Text style={styles.avatarText}>{name?.charAt(0).toUpperCase() || user?.name?.charAt(0).toUpperCase() || '?'}</Text>
         </View>
         <Text style={styles.roleText}>{user?.role || 'Unknown'} Account</Text>
       </View>
 
-      <View style={styles.formContainer}>
+      {isLoading ? (
+        <View style={{ marginTop: 50, alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#007bff" />
+          <Text style={{ marginTop: 10, color: '#666' }}>Loading your profile data...</Text>
+        </View>
+      ) : (
+        <View style={styles.formContainer}>
         <Text style={styles.readOnlyLabel}>Email Address</Text>
         <Text style={styles.readOnlyValue}>{user?.email || ''}</Text>
 
@@ -99,6 +119,7 @@ export default function ProfileScreen() {
           disabled={updateMutation.isPending}
         />
       </View>
+      )}
 
       <View style={styles.logoutContainer}>
         <CustomButton title="Log Out" onPress={logout} />

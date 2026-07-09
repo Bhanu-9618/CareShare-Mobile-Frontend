@@ -19,8 +19,13 @@ export const commonService = {
     return response.data;
   },
 
-  getUploadUrl: async (filename: string) => {
+  getUploadUrl: async (filename: string): Promise<string> => {
     const response = await axiosClient.get(`/upload-url?filename=${encodeURIComponent(filename)}`);
+    return response.data.uploadUrl;
+  },
+
+  getProfile: async () => {
+    const response = await axiosClient.get('/users/profile');
     return response.data;
   },
 

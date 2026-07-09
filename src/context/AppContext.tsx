@@ -3,6 +3,7 @@ import { DeviceEventEmitter } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService } from '../services/authService';
 import { decodeJwt } from '../utils/jwtUtils';
+import { commonService } from '../services/commonService';
 
 export interface User {
   id: string;
@@ -110,7 +111,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
                 name: decoded.name || decoded.email?.split('@')[0] || 'User',
                 email: decoded.email || '',
                 role: tokenRole as any,
-                address: 'Unknown'
+                address: decoded.address?.formatted || 'Unknown Address'
               });
             }
           }
