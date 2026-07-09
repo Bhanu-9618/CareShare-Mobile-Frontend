@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
@@ -8,6 +8,8 @@ import { Donation } from '../../../services/commonService';
 import { COLORS } from '../../../constants/colors';
 
 export default function OngoingTaskScreen({ navigation }: any) {
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
+
   const { data: ongoingTasks = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['ongoingTasks'],
     queryFn: volunteerService.getOngoingTasks,
@@ -45,8 +47,19 @@ export default function OngoingTaskScreen({ navigation }: any) {
     );
   }
 
-  const handleNextStep = (taskId: string) => {
-    Alert.alert('Status Updated', 'Ready to connect the Picked Up API!');
+  const handleNextStep = async (taskId: string) => {
+    try {
+      setIsProcessing(taskId);
+      const res = await volunteerService.pickupDonation(taskId);
+      Alert.alert('Success', res.message || 'Donation picked up successfully!', [
+        { text: 'OK', onPress: () => refetch() }
+      ]);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Failed to pick up donation.';
+      Alert.alert('Error', errorMsg);
+    } finally {
+      setIsProcessing(null);
+    }
   };
 
   return (
@@ -79,13 +92,13 @@ export default function OngoingTaskScreen({ navigation }: any) {
               <View
                 style={[
                   styles.circle,
-                  activeTask.status === 'Picked Up' ? styles.completedCircle : styles.pendingCircle,
+                  activeTask.status === 'LIVE' ? styles.completedCircle : styles.pendingCircle,
                 ]}
               />
               <Text
                 style={[
                   styles.timelineText,
-                  activeTask.status === 'Picked Up' ? styles.completedText : styles.pendingText,
+                  activeTask.status === 'LIVE' ? styles.completedText : styles.pendingText,
                 ]}
               >
                 Picked Up From Hotel
@@ -97,8 +110,9 @@ export default function OngoingTaskScreen({ navigation }: any) {
 
           {activeTask.status === 'ACCEPTED' && (
             <CustomButton
-              title="Picked Up From Hotel"
+              title={isProcessing === activeTask.donationId ? "Processing..." : "Picked Up From Hotel"}
               onPress={() => handleNextStep(activeTask.donationId)}
+              disabled={isProcessing === activeTask.donationId}
             />
           )}
         </View>

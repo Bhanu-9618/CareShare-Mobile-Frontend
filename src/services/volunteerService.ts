@@ -33,5 +33,10 @@ export const volunteerService = {
       console.error("ONGOING TASKS API ERROR: ", error);
       throw error;
     }
+  },
+
+  pickupDonation: async (taskId: string) => {
+    const response = await axiosClient.post(`/volunteer/tasks/${taskId}/pickup`);
+    return response.data;
   }
 };
