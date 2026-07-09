@@ -48,5 +48,15 @@ export const volunteerService = {
       console.error("INVENTORY API ERROR: ", error);
       throw error;
     }
+  },
+
+  cancelRequest: async (donationId: string) => {
+    const response = await axiosClient.post(`/volunteer/donations/${donationId}/cancel`);
+    return response.data;
+  },
+
+  confirmRequest: async (donationId: string) => {
+    const response = await axiosClient.post(`/volunteer/inventory/${donationId}/confirm-request`);
+    return response.data;
   }
 };

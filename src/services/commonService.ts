@@ -11,6 +11,7 @@ export interface Donation {
   expiryAt: number;
   imageKey: string;
   imageUrl: string;
+  generated_otp?: string;
 }
 
 export const commonService = {

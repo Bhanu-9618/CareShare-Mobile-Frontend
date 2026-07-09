@@ -33,5 +33,15 @@ export const receiverService = {
       console.error("RECEIVER PENDING REQUESTS API ERROR: ", error);
       throw error;
     }
+  },
+
+  getReceiverHub: async (): Promise<Donation[]> => {
+    try {
+      const response = await axiosClient.get('/receiver/hub');
+      return response.data;
+    } catch (error) {
+      console.error("RECEIVER HUB API ERROR: ", error);
+      throw error;
+    }
   }
 };

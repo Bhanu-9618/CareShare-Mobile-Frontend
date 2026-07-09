@@ -12,7 +12,7 @@ import VolunteerFeedScreen from '../screens/main/volunteer/VolunteerFeedScreen';
 import FoodDetailScreen from '../screens/main/FoodDetailScreen';
 import OngoingTaskScreen from '../screens/main/volunteer/OngoingTaskScreen';
 import VerificationScreen from '../screens/main/VerificationScreen';
-import ReceiverHomeScreen from '../screens/main/ReceiverHomeScreen';
+import ReceiverHomeScreen from '../screens/main/receiver/ReceiverHomeScreen';
 import HistoryScreen from '../screens/main/HistoryScreen';
 import VolunteerInventoryScreen from '../screens/main/volunteer/VolunteerInventoryScreen';
 import ReceiverLiveFeedScreen from '../screens/main/receiver/ReceiverLiveFeedScreen';

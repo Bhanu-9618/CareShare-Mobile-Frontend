@@ -10,6 +10,7 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
     const [otpModalVisible, setOtpModalVisible] = useState(false);
     const [otpInput, setOtpInput] = useState('');
     const [selectedItem, setSelectedItem] = useState<Donation | null>(null);
+    const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
     const { data: inventoryData = [], isLoading, isError, refetch } = useQuery({
         queryKey: ['volunteerInventory'],
@@ -22,12 +23,38 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
         }, [refetch])
     );
 
-    const handleConfirmRequest = (item: Donation) => {
-        Alert.alert('Ready to Connect', 'Confirm Request API will be connected here.');
+    const handleConfirmRequest = async (item: Donation) => {
+        try {
+            setIsProcessing(item.donationId);
+            const res = await volunteerService.confirmRequest(item.donationId);
+            Alert.alert(
+                'Request Confirmed',
+                res.message || 'The request was successfully confirmed and OTP has been sent to the receiver!',
+                [{ text: 'OK', onPress: () => refetch() }]
+            );
+        } catch (error: any) {
+            const errorMsg = error.response?.data?.message || 'Failed to confirm the request.';
+            Alert.alert('Error', errorMsg);
+        } finally {
+            setIsProcessing(null);
+        }
     };
 
-    const handleCancelRequest = (item: Donation) => {
-        Alert.alert('Ready to Connect', 'Cancel Request API will be connected here.');
+    const handleCancelRequest = async (item: Donation) => {
+        try {
+            setIsProcessing(item.donationId);
+            const res = await volunteerService.cancelRequest(item.donationId);
+            Alert.alert(
+                'Request Cancelled',
+                res.message || 'The request was successfully rejected and the donation is back on the Live feed.',
+                [{ text: 'OK', onPress: () => refetch() }]
+            );
+        } catch (error: any) {
+            const errorMsg = error.response?.data?.message || 'Failed to cancel the request.';
+            Alert.alert('Error', errorMsg);
+        } finally {
+            setIsProcessing(null);
+        }
     };
 
     const handleDeliveredPress = (item: Donation) => {
@@ -89,34 +116,38 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
             </View>
             <Text style={styles.detailText}>📦 Quantity: {item.quantity}</Text>
 
-            {item.status === 'REQUESTED' && (
+            {item.status === 'REQUESTED' && !item.generated_otp && (
                 <View style={styles.actionRow}>
                     <TouchableOpacity
                         style={[styles.actionButton, styles.confirmButton]}
                         onPress={() => handleConfirmRequest(item)}
+                        disabled={isProcessing === item.donationId}
                     >
-                        <Text style={styles.buttonText}>Confirm Request</Text>
+                        <Text style={styles.buttonText}>
+                            {isProcessing === item.donationId ? "Confirming..." : "Confirm Request"}
+                        </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         style={[styles.actionButton, styles.cancelButton]}
                         onPress={() => handleCancelRequest(item)}
+                        disabled={isProcessing === item.donationId}
                     >
-                        <Text style={styles.buttonText}>Cancel</Text>
+                        <Text style={styles.buttonText}>
+                            {isProcessing === item.donationId ? "Canceling..." : "Cancel"}
+                        </Text>
                     </TouchableOpacity>
                 </View>
             )}
 
-            {item.status === 'LIVE' && (
+            {item.status === 'LIVE' && !item.generated_otp && (
                 <Text style={styles.infoText}>Waiting for a Care Center to request this item...</Text>
             )}
 
-            {/* This checks if the status indicates an active transit with OTP. Currently mocking with checking if status is TRANSIT */}
-            {item.status === 'TRANSIT' && (
+            {item.generated_otp && (
                 <>
-                    <View style={styles.otpBox}>
-                        <Text style={styles.otpLabel}>Delivery Status:</Text>
-                        <Text style={styles.otpValue}>In Transit</Text>
+                    <View style={[styles.otpBox, { justifyContent: 'center' }]}>
+                        <Text style={styles.otpLabel}>Status: Ready for Delivery</Text>
                     </View>
                     <TouchableOpacity
                         style={styles.deliveredButton}
@@ -158,7 +189,7 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Enter OTP</Text>
                         <Text style={styles.modalSubtitle}>Please enter the 4-digit OTP provided by the receiver.</Text>
-                        
+
                         <TextInput
                             style={styles.otpInput}
                             value={otpInput}
