@@ -63,11 +63,28 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
         setOtpModalVisible(true);
     };
 
-    const handleVerifyOtp = () => {
+    const handleVerifyOtp = async () => {
         if (!selectedItem) return;
-        // Mock OTP validation until the real API is provided
-        Alert.alert('Ready to Connect', 'Deliver/OTP Verification API will be connected here.');
-        setOtpModalVisible(false);
+        if (!otpInput || otpInput.length < 4) {
+            Alert.alert('Invalid Input', 'Please enter a 4-digit OTP.');
+            return;
+        }
+
+        try {
+            setIsProcessing(selectedItem.donationId);
+            const res = await volunteerService.deliverDonation(selectedItem.donationId, otpInput);
+            setOtpModalVisible(false);
+            setSelectedItem(null);
+            setOtpInput('');
+            Alert.alert('✅ Delivery Successful', res.message || 'OTP verified! Food has been delivered successfully.', [
+                { text: 'OK', onPress: () => refetch() }
+            ]);
+        } catch (error: any) {
+            const errorMsg = error.response?.data?.error || error.response?.data?.message || 'Invalid OTP. Please check with the receiver and try again.';
+            Alert.alert('❌ Verification Failed', errorMsg);
+        } finally {
+            setIsProcessing(null);
+        }
     };
 
     if (isLoading) {
@@ -210,8 +227,11 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.modalVerifyButton]}
                                 onPress={handleVerifyOtp}
+                                disabled={isProcessing !== null}
                             >
-                                <Text style={styles.buttonText}>Verify</Text>
+                                <Text style={styles.buttonText}>
+                                    {isProcessing !== null ? 'Verifying...' : 'Verify'}
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </View>

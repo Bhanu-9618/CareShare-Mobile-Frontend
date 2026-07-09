@@ -58,5 +58,10 @@ export const volunteerService = {
   confirmRequest: async (donationId: string) => {
     const response = await axiosClient.post(`/volunteer/inventory/${donationId}/confirm-request`);
     return response.data;
+  },
+
+  deliverDonation: async (donationId: string, otp: string) => {
+    const response = await axiosClient.post(`/volunteer/inventory/${donationId}/deliver`, { otp });
+    return response.data;
   }
 };
