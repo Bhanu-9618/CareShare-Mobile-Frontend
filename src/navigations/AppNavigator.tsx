@@ -14,7 +14,7 @@ import OngoingTaskScreen from '../screens/main/volunteer/OngoingTaskScreen';
 import VerificationScreen from '../screens/main/VerificationScreen';
 import ReceiverHomeScreen from '../screens/main/ReceiverHomeScreen';
 import HistoryScreen from '../screens/main/HistoryScreen';
-import VolunteerInventoryScreen from '../screens/main/VolunteerInventoryScreen';
+import VolunteerInventoryScreen from '../screens/main/volunteer/VolunteerInventoryScreen';
 import ReceiverLiveFeedScreen from '../screens/main/ReceiverLiveFeedScreen';
 import ReceiverRequestsScreen from '../screens/main/ReceiverRequestsScreen';
 import AdvancedVerificationScreen from '../screens/main/AdvancedVerificationScreen';

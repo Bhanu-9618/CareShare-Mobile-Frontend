@@ -1,35 +1,36 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, TextInput, Modal } from 'react-native';
-import { useApp, FoodItem } from '../../context/AppContext';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, TextInput, Modal, ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useQuery } from '@tanstack/react-query';
+import { volunteerService } from '../../../services/volunteerService';
+import { Donation } from '../../../services/commonService';
+import { COLORS } from '../../../constants/colors';
 
 export default function VolunteerInventoryScreen({ navigation }: any) {
-    const { user, foodList, updateFoodStatus } = useApp();
     const [otpModalVisible, setOtpModalVisible] = useState(false);
     const [otpInput, setOtpInput] = useState('');
-    const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
+    const [selectedItem, setSelectedItem] = useState<Donation | null>(null);
 
-    const myInventory = foodList.filter(
-        (item) =>
-            item.currentVolunteerId === user?.id &&
-            (item.status === 'Picked Up' || item.status === 'Live' || item.status === 'Requested')
+    const { data: inventoryData = [], isLoading, isError, refetch } = useQuery({
+        queryKey: ['volunteerInventory'],
+        queryFn: volunteerService.getInventory,
+    });
+
+    useFocusEffect(
+        useCallback(() => {
+            refetch();
+        }, [refetch])
     );
 
-    const handleConfirmRequest = (item: FoodItem) => {
-        const generatedOtp = Math.floor(1000 + Math.random() * 9000).toString();
-        updateFoodStatus(item.id, 'Requested', item.currentVolunteerId, item.assignedReceiverId, generatedOtp);
-
-        Alert.alert(
-            'Request Confirmed',
-            `Delivery secure OTP code generated: ${generatedOtp}. Please proceed to destination.`
-        );
+    const handleConfirmRequest = (item: Donation) => {
+        Alert.alert('Ready to Connect', 'Confirm Request API will be connected here.');
     };
 
-    const handleCancelRequest = (item: FoodItem) => {
-        updateFoodStatus(item.id, 'Live', item.currentVolunteerId, null, null);
-        Alert.alert('Request Cancelled', 'The food status is reset back to Live feed.');
+    const handleCancelRequest = (item: Donation) => {
+        Alert.alert('Ready to Connect', 'Cancel Request API will be connected here.');
     };
 
-    const handleDeliveredPress = (item: FoodItem) => {
+    const handleDeliveredPress = (item: Donation) => {
         setSelectedItem(item);
         setOtpInput('');
         setOtpModalVisible(true);
@@ -37,31 +38,44 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
 
     const handleVerifyOtp = () => {
         if (!selectedItem) return;
-
-        if (otpInput === selectedItem.generatedOtp) {
-            updateFoodStatus(selectedItem.id, 'Completed', selectedItem.currentVolunteerId, selectedItem.assignedReceiverId, null);
-            setOtpModalVisible(false);
-            setSelectedItem(null);
-            Alert.alert('✅ Delivery Successful', 'OTP verified! Food has been delivered successfully.');
-        } else {
-            Alert.alert('❌ Invalid OTP', 'The OTP you entered does not match. Please try again.');
-        }
+        // Mock OTP validation until the real API is provided
+        Alert.alert('Ready to Connect', 'Deliver/OTP Verification API will be connected here.');
+        setOtpModalVisible(false);
     };
 
-    const renderInventoryItem = ({ item }: { item: FoodItem }) => (
+    if (isLoading) {
+        return (
+            <View style={[styles.container, styles.centered]}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+            </View>
+        );
+    }
+
+    if (isError) {
+        return (
+            <View style={[styles.container, styles.centered]}>
+                <Text style={styles.emptyText}>Failed to load inventory.</Text>
+                <TouchableOpacity onPress={() => refetch()} style={{ marginTop: 10 }}>
+                    <Text style={{ color: COLORS.primary }}>Tap to retry</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+    const renderInventoryItem = ({ item }: { item: Donation }) => (
         <View style={styles.card}>
             <View style={styles.cardHeader}>
                 <Text style={styles.foodName}>{item.foodName}</Text>
                 <View
                     style={[
                         styles.statusBadge,
-                        { backgroundColor: item.status === 'Requested' ? '#d1ecf1' : '#d4edda' },
+                        { backgroundColor: item.status === 'REQUESTED' ? '#d1ecf1' : '#d4edda' },
                     ]}
                 >
                     <Text
                         style={[
                             styles.statusText,
-                            { color: item.status === 'Requested' ? '#0c5460' : '#155724' },
+                            { color: item.status === 'REQUESTED' ? '#0c5460' : '#155724' },
                         ]}
                     >
                         {item.status}
@@ -69,11 +83,13 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
                 </View>
             </View>
 
-            <Text style={styles.hotelName}>🏢 From: {item.hotelName}</Text>
-            <Text style={styles.addressText}>Location: {item.address}</Text>
+            <View style={styles.locationContainer}>
+                <Text style={styles.locationLabel}>Pickup Location:</Text>
+                <Text style={styles.locationText}>{item.location}</Text>
+            </View>
             <Text style={styles.detailText}>📦 Quantity: {item.quantity}</Text>
 
-            {item.status === 'Requested' && (
+            {item.status === 'REQUESTED' && (
                 <View style={styles.actionRow}>
                     <TouchableOpacity
                         style={[styles.actionButton, styles.confirmButton]}
@@ -91,21 +107,22 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
                 </View>
             )}
 
-            {item.status === 'Live' && !item.generatedOtp && (
+            {item.status === 'LIVE' && (
                 <Text style={styles.infoText}>Waiting for a Care Center to request this item...</Text>
             )}
 
-            {item.generatedOtp && (
+            {/* This checks if the status indicates an active transit with OTP. Currently mocking with checking if status is TRANSIT */}
+            {item.status === 'TRANSIT' && (
                 <>
                     <View style={styles.otpBox}>
-                        <Text style={styles.otpLabel}>Active Transit OTP:</Text>
-                        <Text style={styles.otpValue}>{item.generatedOtp}</Text>
+                        <Text style={styles.otpLabel}>Delivery Status:</Text>
+                        <Text style={styles.otpValue}>In Transit</Text>
                     </View>
                     <TouchableOpacity
                         style={styles.deliveredButton}
                         onPress={() => handleDeliveredPress(item)}
                     >
-                        <Text style={styles.deliveredButtonText}>✅ Delivered</Text>
+                        <Text style={styles.deliveredButtonText}>✅ Mark as Delivered</Text>
                     </TouchableOpacity>
                 </>
             )}
@@ -118,8 +135,8 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
             <Text style={styles.subtitle}>Manage food currently in your transit possession.</Text>
 
             <FlatList
-                data={myInventory}
-                keyExtractor={(item) => item.id}
+                data={inventoryData}
+                keyExtractor={(item) => item.donationId}
                 renderItem={renderInventoryItem}
                 contentContainerStyle={styles.listContainer}
                 showsVerticalScrollIndicator={false}
@@ -180,6 +197,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingTop: 25,
     },
+    centered: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -228,6 +249,7 @@ const styles = StyleSheet.create({
     detailText: {
         fontSize: 13,
         color: '#555555',
+        marginTop: 8,
         marginBottom: 4,
     },
     infoText: {
@@ -235,6 +257,25 @@ const styles = StyleSheet.create({
         color: '#666666',
         fontStyle: 'italic',
         marginTop: 10,
+    },
+    locationContainer: {
+        backgroundColor: '#eef2f7',
+        padding: 10,
+        borderRadius: 8,
+        marginTop: 5,
+        borderLeftWidth: 4,
+        borderLeftColor: '#007bff'
+    },
+    locationLabel: {
+        fontSize: 11,
+        color: '#666',
+        fontWeight: '600',
+        marginBottom: 2,
+    },
+    locationText: {
+        fontSize: 14,
+        color: '#1a1a1a',
+        fontWeight: 'bold',
     },
     actionRow: {
         flexDirection: 'row',
@@ -287,17 +328,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#333333',
         marginBottom: 8,
-    },
-    hotelName: {
-        fontSize: 14,
-        color: '#444444',
-        fontWeight: '600',
-        marginBottom: 4,
-    },
-    addressText: {
-        fontSize: 13,
-        color: '#888888',
-        marginBottom: 4,
     },
     subEmptyText: {
         fontSize: 13,

@@ -38,5 +38,15 @@ export const volunteerService = {
   pickupDonation: async (taskId: string) => {
     const response = await axiosClient.post(`/volunteer/tasks/${taskId}/pickup`);
     return response.data;
+  },
+
+  getInventory: async (): Promise<Donation[]> => {
+    try {
+      const response = await axiosClient.get('/volunteer/inventory');
+      return response.data;
+    } catch (error) {
+      console.error("INVENTORY API ERROR: ", error);
+      throw error;
+    }
   }
 };
