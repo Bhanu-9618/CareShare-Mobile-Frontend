@@ -1,40 +1,51 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, Alert } from 'react-native';
-import { useApp, FoodItem } from '../../context/AppContext';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useQuery } from '@tanstack/react-query';
+import { useApp } from '../../../context/AppContext';
+import { receiverService } from '../../../services/receiverService';
+import { Donation } from '../../../services/commonService';
+import { COLORS } from '../../../constants/colors';
 
 export default function ReceiverLiveFeedScreen() {
-  const { user, foodList, updateFoodStatus } = Object.assign({}, useApp());
-  const [searchQuery, setSearchQuery] = useState('');
+  const { user } = useApp();
 
-  const liveFoodItems = foodList.filter(
-    (item) => item.status === 'Live' && item.assignedReceiverId === null
+  const { data: liveFoodItems = [], isLoading, isError, refetch } = useQuery({
+    queryKey: ['receiverLiveFeed'],
+    queryFn: receiverService.getLiveFeed,
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
   );
 
-  const filteredItems = liveFoodItems.filter((item) =>
-    item.foodName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.hotelName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const getExpiryText = (epochSeconds: number) => {
+    const diffMs = (epochSeconds * 1000) - Date.now();
+    if (diffMs <= 0) return 'Expired';
+    const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
+    return `In ${diffHours} Hour${diffHours === 1 ? '' : 's'}`;
+  };
 
-  const handleRequestFood = (item: FoodItem) => {
+  const handleRequestFood = (item: Donation) => {
     if (!user) {
       Alert.alert('Error', 'You must be logged in to request food.');
       return;
     }
 
-    updateFoodStatus(item.id, 'Requested', item.currentVolunteerId, user.id, null);
     Alert.alert(
-      'Request Submitted',
-      `Your request for "${item.foodName}" has been sent to the volunteer. Please wait for confirmation.`
+      'Ready to Connect',
+      `The Request Food API for "${item.foodName}" will be connected here once the backend endpoint is provided.`
     );
   };
 
-  const renderLiveItem = ({ item }: { item: FoodItem }) => (
+  const renderLiveItem = ({ item }: { item: Donation }) => (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
-        <View>
+        <View style={{ flex: 1 }}>
           <Text style={styles.foodName}>{item.foodName}</Text>
-          <Text style={styles.hotelName}>🏢 Sourced from: {item.hotelName}</Text>
-          <Text style={styles.addressText}>Address: {item.address}</Text>
+          <Text style={styles.addressText}>Location: {item.location}</Text>
         </View>
         <View style={styles.liveBadge}>
           <Text style={styles.liveText}>{item.status}</Text>
@@ -43,7 +54,7 @@ export default function ReceiverLiveFeedScreen() {
 
       <View style={styles.detailsContainer}>
         <Text style={styles.detailText}>📦 Quantity: {item.quantity}</Text>
-        <Text style={styles.detailText}>⏳ Expiry Ref: {item.expiryTime}</Text>
+        <Text style={styles.detailText}>⏳ Expiry Ref: {getExpiryText(item.expiryAt)}</Text>
         <Text style={styles.volunteerInfo}>🚴 Courier: Connected Volunteer</Text>
       </View>
 
@@ -58,27 +69,32 @@ export default function ReceiverLiveFeedScreen() {
       <Text style={styles.title}>Live Volunteer Feed</Text>
       <Text style={styles.subtitle}>Claim food items currently held live in transit by nearby volunteers.</Text>
 
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search by food name or hotel..."
-        placeholderTextColor="#999999"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
-
-      <FlatList
-        data={filteredItems}
-        keyExtractor={(item) => item.id}
-        renderItem={renderLiveItem}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No live food available right now.</Text>
-            <Text style={styles.subEmptyText}>Active transit items will appear as soon as volunteers pick up donations.</Text>
-          </View>
-        }
-      />
+      {isLoading ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      ) : isError ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Failed to load live feed.</Text>
+          <TouchableOpacity onPress={() => refetch()} style={{ marginTop: 10 }}>
+            <Text style={{ color: COLORS.primary }}>Tap to retry</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={liveFoodItems}
+          keyExtractor={(item) => item.donationId}
+          renderItem={renderLiveItem}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No live food available right now.</Text>
+              <Text style={styles.subEmptyText}>Active transit items will appear as soon as volunteers pick up donations.</Text>
+            </View>
+          }
+        />
+      )}
     </View>
   );
 }
@@ -100,18 +116,6 @@ const styles = StyleSheet.create({
     color: '#666666',
     marginBottom: 15,
     lineHeight: 20,
-  },
-  searchBar: {
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#ced4da',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    fontSize: 14,
-    color: '#333333',
-    marginBottom: 20,
-    elevation: 1,
   },
   listContainer: {
     paddingBottom: 20,
@@ -139,12 +143,6 @@ const styles = StyleSheet.create({
     color: '#333333',
     marginBottom: 2,
   },
-  hotelName: {
-    fontSize: 13,
-    color: '#444444',
-    fontWeight: '600',
-    marginBottom: 2,
-  },
   addressText: {
     fontSize: 12,
     color: '#888888',
@@ -154,6 +152,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
+    marginLeft: 10,
   },
   liveText: {
     fontSize: 10,
