@@ -2,6 +2,9 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useApp } from '../context/AppContext';
+import { RootStackParamList, RootTabParamList } from '../types/navigation';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { COLORS } from '../constants/colors';
 
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
@@ -21,12 +24,43 @@ import AdvancedVerificationScreen from '../screens/main/AdvancedVerificationScre
 import ProfileScreen from '../screens/main/ProfileScreen';
 import ExpiredDonationsScreen from '../screens/main/ExpiredDonationsScreen';
 
-const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<RootTabParamList>();
+
+const getScreenOptions = ({ route }: any) => ({
+  headerShown: false,
+  tabBarIcon: ({ focused, color, size }: any) => {
+    let iconName = 'help-outline';
+
+    if (route.name === 'Donor Home' || route.name === 'Receiver Hub') {
+      iconName = focused ? 'home' : 'home-outline';
+    } else if (route.name === 'Post Food') {
+      iconName = focused ? 'add-circle' : 'add-circle-outline';
+    } else if (route.name === 'History Log') {
+      iconName = focused ? 'time' : 'time-outline';
+    } else if (route.name === 'Expired') {
+      iconName = focused ? 'warning' : 'warning-outline';
+    } else if (route.name === 'Profile') {
+      iconName = focused ? 'person' : 'person-outline';
+    } else if (route.name === 'Available Food' || route.name === 'Live Feed') {
+      iconName = focused ? 'restaurant' : 'restaurant-outline';
+    } else if (route.name === 'My Inventory') {
+      iconName = focused ? 'cube' : 'cube-outline';
+    } else if (route.name === 'My Task') {
+      iconName = focused ? 'bicycle' : 'bicycle-outline';
+    } else if (route.name === 'My Requests') {
+      iconName = focused ? 'list' : 'list-outline';
+    }
+
+    return <Ionicons name={iconName} size={size} color={color} />;
+  },
+  tabBarActiveTintColor: COLORS.primary,
+  tabBarInactiveTintColor: 'gray',
+});
 
 function DonorTabs() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator screenOptions={getScreenOptions}>
       <Tab.Screen name="Donor Home" component={DonorHomeScreen} />
       <Tab.Screen name="Post Food" component={AddFoodScreen} />
       <Tab.Screen name="History Log" component={HistoryScreen} />
@@ -38,7 +72,7 @@ function DonorTabs() {
 
 function VolunteerTabs() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator screenOptions={getScreenOptions}>
       <Tab.Screen name="Available Food" component={VolunteerFeedScreen} />
       <Tab.Screen name="My Inventory" component={VolunteerInventoryScreen} />
       <Tab.Screen name="My Task" component={OngoingTaskScreen} />
@@ -51,7 +85,7 @@ function VolunteerTabs() {
 
 function ReceiverTabs() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator screenOptions={getScreenOptions}>
       <Tab.Screen name="Live Feed" component={ReceiverLiveFeedScreen} />
       <Tab.Screen name="My Requests" component={ReceiverRequestsScreen} />
       <Tab.Screen name="Receiver Hub" component={ReceiverHomeScreen} />

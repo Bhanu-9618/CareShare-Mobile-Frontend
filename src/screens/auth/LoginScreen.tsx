@@ -7,8 +7,13 @@ import { COLORS } from '../../constants/colors';
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '../../services/authService';
 import { decodeJwt } from '../../utils/jwtUtils';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../../types/navigation';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-export default function LoginScreen({ navigation }: any) {
+type Props = StackScreenProps<RootStackParamList, 'Login'>;
+
+export default function LoginScreen({ navigation }: Props) {
   const { login } = useApp();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,9 +49,10 @@ export default function LoginScreen({ navigation }: any) {
       });
 
     },
-    onError: (error: any) => {
-      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Login Failed';
-      if (error.response?.status === 401 || errorMessage.toLowerCase().includes('invalid')) {
+    onError: (error: unknown) => {
+      const err = error as any;
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Login Failed';
+      if (err.response?.status === 401 || errorMessage.toLowerCase().includes('invalid')) {
         Alert.alert('Invalid credentials', 'Please check your details or register.');
       } else {
         Alert.alert('Login Failed', errorMessage);
@@ -64,6 +70,9 @@ export default function LoginScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.iconContainer}>
+        <Ionicons name="fast-food" size={80} color={COLORS.primary} />
+      </View>
       <Text style={styles.logo}>CareShare</Text>
       <Text style={styles.subtitle}>Welcome back! Please login to your account.</Text>
 
@@ -107,8 +116,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    padding: 30,
     backgroundColor: '#ffffff',
-    padding: 25,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
   },
   logo: {
     fontSize: 36,

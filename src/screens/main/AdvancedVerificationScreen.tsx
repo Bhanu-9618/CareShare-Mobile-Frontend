@@ -2,13 +2,17 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import { useApp } from '../../context/AppContext';
 import CustomButton from '../../components/CustomButton';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../../types/navigation';
 
-export default function AdvancedVerificationScreen({ route, navigation }: any) {
-  const { foodId } = route.params;
-  const { foodList, updateFoodStatus } = useApp();
+type Props = StackScreenProps<RootStackParamList, 'AdvancedVerification'>;
+
+export default function AdvancedVerificationScreen({ route, navigation }: Props) {
+  const { foodId } = route.params as any;
+  const { foodList, updateFoodStatus } = useApp() as any;
   const [enteredOtp, setEnteredOtp] = useState(['', '', '', '']);
 
-  const currentItem = foodList.find((item) => item.id === foodId);
+  const currentItem = foodList?.find((item: any) => item.id === foodId);
 
   const handleOtpChange = (value: string, index: number) => {
     const newOtp = [...enteredOtp];

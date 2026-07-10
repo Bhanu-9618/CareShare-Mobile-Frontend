@@ -6,8 +6,18 @@ import { useApp } from '../../../context/AppContext';
 import { COLORS } from '../../../constants/colors';
 import { volunteerService } from '../../../services/volunteerService';
 import { Donation } from '../../../services/commonService';
+import { getExpiryText, getStatusColor } from '../../../utils/helpers';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { StackScreenProps } from '@react-navigation/stack';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { RootTabParamList, RootStackParamList } from '../../../types/navigation';
 
-export default function VolunteerFeedScreen({ navigation }: any) {
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<RootTabParamList, 'Available Food'>,
+  StackScreenProps<RootStackParamList>
+>;
+
+export default function VolunteerFeedScreen({ navigation }: Props) {
   const { user } = useApp();
 
   const { data: feedData = [], isLoading, isError, refetch } = useQuery({
@@ -22,22 +32,6 @@ export default function VolunteerFeedScreen({ navigation }: any) {
   );
 
   const activeFoods = feedData.filter((item) => item.status === 'ACTIVE');
-
-  const getStatusColor = (status: string) => {
-    switch (status?.toUpperCase()) {
-      case 'ACTIVE': return '#007bff';
-      case 'ACCEPTED': return '#ffc107';
-      case 'COMPLETED': return COLORS.primary || 'green';
-      default: return '#6c757d';
-    }
-  };
-
-  const getExpiryText = (epochSeconds: number) => {
-    const diffMs = (epochSeconds * 1000) - Date.now();
-    if (diffMs <= 0) return 'Expired';
-    const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
-    return `In ${diffHours} Hour${diffHours === 1 ? '' : 's'}`;
-  };
 
   const renderFeedCard = ({ item }: { item: Donation }) => (
     <TouchableOpacity

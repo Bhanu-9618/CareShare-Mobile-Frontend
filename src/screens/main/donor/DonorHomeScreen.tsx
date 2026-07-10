@@ -6,6 +6,7 @@ import { COLORS } from '../../../constants/colors';
 import { useQuery } from '@tanstack/react-query';
 import { donorService } from '../../../services/donorService';
 import { Donation } from '../../../services/commonService';
+import { getExpiryText, getStatusColor } from '../../../utils/helpers';
 
 export default function DonorHomeScreen() {
   const { user } = useApp();
@@ -22,22 +23,6 @@ export default function DonorHomeScreen() {
   );
 
   const activeDonations = donations.filter((item) => item.status !== 'COMPLETED');
-
-  const getStatusColor = (status: string) => {
-    switch (status?.toUpperCase()) {
-      case 'ACTIVE': return '#007bff';
-      case 'ACCEPTED': return '#ffc107';
-      case 'COMPLETED': return COLORS.primary || 'green';
-      default: return '#6c757d';
-    }
-  };
-
-  const getExpiryText = (epochSeconds: number) => {
-    const diffMs = (epochSeconds * 1000) - Date.now();
-    if (diffMs <= 0) return 'Expired';
-    const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
-    return `In ${diffHours} Hour${diffHours === 1 ? '' : 's'}`;
-  };
 
   const renderFoodCard = ({ item }: { item: Donation }) => (
     <View style={styles.card}>
@@ -63,8 +48,13 @@ export default function DonorHomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.welcomeText}>Welcome back,</Text>
-        <Text style={styles.userName}>{user?.name || 'Hotel Owner'}</Text>
+        <View style={styles.userInfo}>
+          <Text style={styles.welcomeText}>Hello,</Text>
+          <Text style={styles.userName}>{user?.name || 'User'}</Text>
+        </View>
+        <View style={styles.roleBadge}>
+          <Text style={styles.roleText}>{user?.role || 'Donor'}</Text>
+        </View>
       </View>
 
       <Text style={styles.sectionTitle}>Your Donations</Text>
@@ -99,30 +89,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 25,
+    paddingBottom: 15,
     backgroundColor: '#ffffff',
-    padding: 20,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
+  },
+  userInfo: {
+    flexDirection: 'column',
   },
   welcomeText: {
     fontSize: 14,
     color: '#666',
   },
   userName: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
   },
+  roleBadge: {
+    backgroundColor: '#e3f2fd',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
   roleText: {
     fontSize: 12,
-    color: COLORS.primary || 'green',
-    fontWeight: '600',
-    marginTop: 2,
+    fontWeight: 'bold',
+    color: '#007bff',
   },
   sectionTitle: {
     fontSize: 18,

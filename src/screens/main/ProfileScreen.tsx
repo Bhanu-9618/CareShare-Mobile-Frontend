@@ -11,7 +11,7 @@ export default function ProfileScreen() {
   
   const [name, setName] = React.useState(user?.name || '');
   const [address, setAddress] = React.useState(user?.address || '');
-  const [errors, setErrors] = React.useState<any>({});
+  const [errors, setErrors] = React.useState<Record<string, string>>({});
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['profileData'],
@@ -32,15 +32,16 @@ export default function ProfileScreen() {
       updateProfile(name, address);
       Alert.alert('Success', 'Profile updated successfully!');
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message || 'Failed to update profile.';
+    onError: (error: unknown) => {
+      const err = error as any;
+      const msg = err.response?.data?.message || 'Failed to update profile.';
       Alert.alert('Error', msg);
     }
   });
 
   const handleUpdate = () => {
     let valid = true;
-    let localErrors: any = {};
+    let localErrors: Record<string, string> = {};
 
     if (!name.trim()) {
       localErrors.name = 'Name is required';
@@ -54,7 +55,7 @@ export default function ProfileScreen() {
     setErrors(localErrors);
 
     if (valid) {
-      const payload: any = {};
+      const payload: { name?: string; address?: string } = {};
       let hasChanges = false;
 
       if (name.trim() !== user?.name) {

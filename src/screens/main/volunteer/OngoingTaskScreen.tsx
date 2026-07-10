@@ -6,8 +6,12 @@ import CustomButton from '../../../components/CustomButton';
 import { volunteerService } from '../../../services/volunteerService';
 import { Donation } from '../../../services/commonService';
 import { COLORS } from '../../../constants/colors';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { RootTabParamList } from '../../../types/navigation';
 
-export default function OngoingTaskScreen({ navigation }: any) {
+type Props = BottomTabScreenProps<RootTabParamList, 'My Task'>;
+
+export default function OngoingTaskScreen({ navigation }: Props) {
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const { data: ongoingTasks = [], isLoading, isError, refetch } = useQuery({
@@ -54,8 +58,9 @@ export default function OngoingTaskScreen({ navigation }: any) {
       Alert.alert('Success', res.message || 'Donation picked up successfully!', [
         { text: 'OK', onPress: () => refetch() }
       ]);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || 'Failed to pick up donation.';
+    } catch (error: unknown) {
+      const err = error as any;
+      const errorMsg = err.response?.data?.message || 'Failed to pick up donation.';
       Alert.alert('Error', errorMsg);
     } finally {
       setIsProcessing(null);
@@ -63,24 +68,36 @@ export default function OngoingTaskScreen({ navigation }: any) {
   };
 
   const handleCancel = async (taskId: string) => {
-    try {
-      setIsProcessing(taskId);
-      const res = await volunteerService.unclaimDonation(taskId);
-      Alert.alert('Success', res.message || 'Donation unclaimed successfully!', [
-        { text: 'OK', onPress: () => refetch() }
-      ]);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || 'Failed to cancel donation.';
-      Alert.alert('Error', errorMsg);
-    } finally {
-      setIsProcessing(null);
-    }
+    Alert.alert(
+      'Cancel Task',
+      'Are you sure you want to cancel this delivery task?',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              setIsProcessing(taskId);
+              const res = await volunteerService.unclaimDonation(taskId);
+              Alert.alert('Success', res.message || 'Donation unclaimed successfully!', [
+                { text: 'OK', onPress: () => refetch() }
+              ]);
+            } catch (error: unknown) {
+              const err = error as any;
+              const errorMsg = err.response?.data?.message || 'Failed to cancel donation.';
+              Alert.alert('Error', errorMsg);
+            } finally {
+              setIsProcessing(null);
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Ongoing Delivery Tasks</Text>
-      <Text style={styles.subtitle}>Track your progress ({ongoingTasks.length}/5).</Text>
 
       {ongoingTasks.map((activeTask: Donation) => (
         <View key={activeTask.donationId} style={styles.taskWrapper}>
@@ -155,6 +172,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333333',
     marginTop: 15,
+    marginBottom: 20,
   },
   subtitle: {
     fontSize: 14,

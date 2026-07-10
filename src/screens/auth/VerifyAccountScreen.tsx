@@ -5,8 +5,12 @@ import CustomInput from '../../components/CustomInput';
 import { COLORS } from '../../constants/colors';
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '../../services/authService';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../../types/navigation';
 
-export default function VerifyAccountScreen({ route, navigation }: any) {
+type Props = StackScreenProps<RootStackParamList, 'VerifyAccount'>;
+
+export default function VerifyAccountScreen({ route, navigation }: Props) {
   const { email } = route.params || {};
   const [otp, setOtp] = useState('');
 
@@ -17,8 +21,9 @@ export default function VerifyAccountScreen({ route, navigation }: any) {
         { text: 'OK', onPress: () => navigation.navigate('Login') },
       ]);
     },
-    onError: (error: any) => {
-      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Invalid verification code provided, please try again.';
+    onError: (error: unknown) => {
+      const err = error as any;
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Invalid verification code provided, please try again.';
       Alert.alert('Verification Failed', errorMessage);
     }
   });
