@@ -45,7 +45,6 @@ export default function HistoryScreen() {
         {item.donorName ? <Text style={styles.donorName}>{item.donorName}</Text> : null}
         {item.volunteerName ? <Text style={styles.volunteerName}>Accepted By : {item.volunteerName}</Text> : null}
         {item.receiverName ? <Text style={styles.receiverName}>Received By : {item.receiverName}</Text> : null}
-        <Text style={styles.locationText}>{item.location}</Text>
         <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
         <View style={styles.expiryRow}>
           <Text style={styles.expiry}>Expires: {getExpiryText(item.expiryAt)}</Text>
@@ -152,11 +151,6 @@ const styles = StyleSheet.create({
     color: '#28a745',
     fontWeight: '600',
     marginTop: 2,
-  },
-  locationText: {
-    fontSize: 13,
-    color: '#666666',
-    marginBottom: 4,
   },
   quantity: {
     fontSize: 13,
