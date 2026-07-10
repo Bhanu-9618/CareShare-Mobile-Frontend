@@ -1,0 +1,158 @@
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { DeviceEventEmitter } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authService } from '../services/authService';
+import { decodeJwt } from '../utils/jwtUtils';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'Donor' | 'Volunteer' | 'Receiver';
+  address: string;
+}
+
+export interface RegisteredUser {
+  name: string;
+  email: string;
+  password: string;
+  role: 'Donor' | 'Volunteer' | 'Receiver';
+  address: string;
+}
+
+export interface FoodItem {
+  id: string;
+  foodName: string;
+  hotelName: string;
+  quantity: string;
+  expiryTime: string;
+  address: string;
+  image?: string;
+  status: 'Active' | 'Accepted' | 'Picked Up' | 'Live' | 'Requested' | 'Completed';
+  currentVolunteerId: string | null;
+  assignedReceiverId: string | null;
+  generatedOtp: string | null;
+}
+
+interface AppContextType {
+  user: User | null;
+  isLoading: boolean;
+  register: () => { success: boolean; message: string };
+  login: (userData: User) => void;
+  logout: () => void;
+  updateProfile: (name: string, address: string) => void;
+}
+
+export const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export const getExpiryDisplay = (isoString: string) => {
+  try {
+    if (!isoString || typeof isoString !== 'string') return String(isoString);
+
+
+
+    const match = isoString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})/);
+    
+    if (!match) {
+      return isoString;
+    }
+
+    const [_, year, month, day, hours, minutes, seconds] = match;
+    
+
+    const expiryDate = new Date(Date.UTC(+year, +month - 1, +day, +hours, +minutes, +seconds));
+    
+    if (isNaN(expiryDate.getTime())) return isoString;
+    
+    const diffMs = expiryDate.getTime() - Date.now();
+    if (diffMs <= 0) return 'Expired';
+    
+    const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
+    return `In ${diffHours} ${diffHours === 1 ? 'Hour' : 'Hours'}`;
+  } catch (e) {
+    return isoString;
+  }
+};
+
+export const AppProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+
+    const checkUserToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('userToken');
+        if (token) {
+          const decoded = decodeJwt(token);
+          if (decoded) {
+
+            const isExpired = decoded.exp ? (decoded.exp * 1000) < Date.now() : false;
+            
+            if (isExpired) {
+              await AsyncStorage.removeItem('userToken');
+            } else {
+              let tokenRole = decoded['custom:role'] || 'Donor';
+
+              tokenRole = tokenRole.charAt(0).toUpperCase() + tokenRole.slice(1).toLowerCase();
+              
+              setUser({
+                id: decoded.sub || 'unknown',
+                name: decoded.name || decoded.email?.split('@')[0] || 'User',
+                email: decoded.email || '',
+                role: tokenRole as any,
+                address: decoded.address?.formatted || 'Unknown Address'
+              });
+            }
+          }
+        }
+      } catch (e) {
+
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    checkUserToken();
+
+
+    const authListener = DeviceEventEmitter.addListener('auth_error', () => {
+      setUser(null);
+    });
+
+    return () => {
+      authListener.remove();
+    };
+  }, []);
+  const register = () => {
+    return { success: true, message: 'Account created successfully!' };
+  };
+
+  const login = (userData: User) => {
+    setUser(userData);
+  };
+
+  const logout = async () => {
+    await authService.logout();
+    setUser(null);
+  };
+
+  const updateProfile = (name: string, address: string) => {
+    if (user) {
+      setUser({ ...user, name, address });
+    }
+  };
+
+  return (
+    <AppContext.Provider value={{ user, isLoading, register, login, logout, updateProfile }}>
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+export const useApp = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useApp must be used within an AppProvider');
+  }
+  return context;
+};
