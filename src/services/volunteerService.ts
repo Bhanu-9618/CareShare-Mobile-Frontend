@@ -21,6 +21,11 @@ export const volunteerService = {
     return response.data;
   },
 
+  unclaimDonation: async (donationId: string) => {
+    const response = await axiosClient.put(`/volunteer/donations/${donationId}/unclaim`);
+    return response.data;
+  },
+
   getOngoingTasks: async (): Promise<Donation[]> => {
     try {
       const response = await axiosClient.get('/volunteer/tasks/ongoing');

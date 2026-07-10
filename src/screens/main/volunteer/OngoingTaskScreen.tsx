@@ -62,6 +62,21 @@ export default function OngoingTaskScreen({ navigation }: any) {
     }
   };
 
+  const handleCancel = async (taskId: string) => {
+    try {
+      setIsProcessing(taskId);
+      const res = await volunteerService.unclaimDonation(taskId);
+      Alert.alert('Success', res.message || 'Donation unclaimed successfully!', [
+        { text: 'OK', onPress: () => refetch() }
+      ]);
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || 'Failed to cancel donation.';
+      Alert.alert('Error', errorMsg);
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Ongoing Delivery Tasks</Text>
@@ -72,7 +87,6 @@ export default function OngoingTaskScreen({ navigation }: any) {
           <View style={styles.detailsContainer}>
             <Text style={styles.foodName}>{activeTask.foodName}</Text>
             {activeTask.donorName ? <Text style={styles.donorName}>{activeTask.donorName}</Text> : null}
-            <Text style={styles.addressText}>{activeTask.location}</Text>
             
             <View style={styles.locationContainer}>
               <Text style={styles.locationLabel}>Pickup Location:</Text>
@@ -110,11 +124,19 @@ export default function OngoingTaskScreen({ navigation }: any) {
           <View style={{ marginTop: 20 }} />
 
           {activeTask.status === 'ACCEPTED' && (
-            <CustomButton
-              title={isProcessing === activeTask.donationId ? "Processing..." : "Picked Up From Hotel"}
-              onPress={() => handleNextStep(activeTask.donationId)}
-              disabled={isProcessing === activeTask.donationId}
-            />
+            <View>
+              <CustomButton
+                title={isProcessing === activeTask.donationId ? "Processing..." : "Picked Up From Hotel"}
+                onPress={() => handleNextStep(activeTask.donationId)}
+                disabled={isProcessing === activeTask.donationId}
+              />
+              <View style={{ marginTop: 10 }} />
+              <CustomButton
+                title={isProcessing === activeTask.donationId ? "Processing..." : "Cancel"}
+                onPress={() => handleCancel(activeTask.donationId)}
+                disabled={isProcessing === activeTask.donationId}
+              />
+            </View>
           )}
         </View>
       ))}
@@ -163,11 +185,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#555',
     marginTop: 2,
-  },
-  addressText: {
-    fontSize: 14,
-    color: '#555555',
-    marginBottom: 5,
   },
   quantity: {
     fontSize: 14,
