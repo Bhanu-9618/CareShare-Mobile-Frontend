@@ -98,7 +98,6 @@ export default function OngoingTaskScreen({ navigation }: Props) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Ongoing Delivery Tasks</Text>
-      <Text style={styles.subtitle}>Track your progress ({ongoingTasks.length}/5).</Text>
 
       {ongoingTasks.map((activeTask: Donation) => (
         <View key={activeTask.donationId} style={styles.taskWrapper}>
@@ -173,6 +172,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333333',
     marginTop: 15,
+    marginBottom: 20,
   },
   subtitle: {
     fontSize: 14,

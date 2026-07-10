@@ -92,9 +92,17 @@ export default function ReceiverLiveFeedScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Live Volunteer Feed</Text>
-      <Text style={styles.subtitle}>Claim food items currently held live in transit by nearby volunteers.</Text>
+      <View style={styles.header}>
+        <View style={styles.userInfo}>
+          <Text style={styles.welcomeText}>Hello,</Text>
+          <Text style={styles.userName}>{user?.name || 'User'}</Text>
+        </View>
+        <View style={styles.roleBadge}>
+          <Text style={styles.roleText}>{user?.role || 'Receiver'}</Text>
+        </View>
+      </View>
 
+      <Text style={styles.sectionTitle}>Live Volunteer Feed</Text>
       {isLoading ? (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size="large" color={COLORS.primary} />
@@ -129,22 +137,50 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8f9fa',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 25,
+    paddingBottom: 15,
+    backgroundColor: '#ffffff',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333333',
+  userInfo: {
+    flexDirection: 'column',
   },
-  subtitle: {
+  welcomeText: {
     fontSize: 14,
-    color: '#666666',
-    marginBottom: 15,
-    lineHeight: 20,
+    color: '#666',
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  roleBadge: {
+    backgroundColor: '#e3f2fd',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  roleText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: '#007bff',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginHorizontal: 20,
+    marginTop: 15,
+    marginBottom: 10,
   },
   listContainer: {
     paddingBottom: 20,
+    paddingHorizontal: 20,
   },
   card: {
     backgroundColor: '#ffffff',
