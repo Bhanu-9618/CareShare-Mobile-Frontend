@@ -69,9 +69,10 @@ export default function OngoingTaskScreen({ navigation }: any) {
 
       {ongoingTasks.map((activeTask: Donation) => (
         <View key={activeTask.donationId} style={styles.taskWrapper}>
-          <View style={styles.card}>
+          <View style={styles.detailsContainer}>
             <Text style={styles.foodName}>{activeTask.foodName}</Text>
-            <Text style={styles.quantity}>Quantity: {activeTask.quantity}</Text>
+            {activeTask.donorName ? <Text style={styles.donorName}>{activeTask.donorName}</Text> : null}
+            <Text style={styles.addressText}>{activeTask.location}</Text>
             
             <View style={styles.locationContainer}>
               <Text style={styles.locationLabel}>Pickup Location:</Text>
@@ -149,21 +150,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 15,
-    padding: 20,
+  detailsContainer: {
     marginBottom: 25,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
   },
   foodName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333333',
+    color: '#333',
+  },
+  donorName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555',
+    marginTop: 2,
+  },
+  addressText: {
+    fontSize: 14,
+    color: '#555555',
     marginBottom: 5,
   },
   quantity: {

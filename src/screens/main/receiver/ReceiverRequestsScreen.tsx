@@ -21,7 +21,10 @@ export default function ReceiverRequestsScreen() {
   const renderRequestItem = ({ item }: { item: Donation }) => (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
-        <Text style={styles.foodName}>{item.foodName}</Text>
+        <View>
+          <Text style={styles.foodName}>{item.foodName}</Text>
+          {item.donorName ? <Text style={styles.donorName}>{item.donorName}</Text> : null}
+        </View>
         <View
           style={[
             styles.statusBadge,
@@ -41,6 +44,7 @@ export default function ReceiverRequestsScreen() {
 
       <Text style={styles.addressText}>Pickup Location: {item.location}</Text>
       <Text style={styles.detailText}>📦 Quantity: {item.quantity}</Text>
+      {item.volunteerName ? <Text style={styles.volunteerName}>Accepted By : {item.volunteerName}</Text> : null}
 
       <Text style={styles.waitingText}>Waiting for the volunteer to confirm your request...</Text>
     </View>
@@ -124,6 +128,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333333',
   },
+  donorName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555',
+    marginBottom: 4,
+  },
+  volunteerName: {
+    fontSize: 13,
+    color: '#0056b3',
+    fontWeight: '500',
+    marginBottom: 4,
+  },
   statusBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -135,7 +151,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   addressText: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#444444',
     marginBottom: 4,
   },

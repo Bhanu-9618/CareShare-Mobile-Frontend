@@ -50,6 +50,7 @@ export default function VolunteerFeedScreen({ navigation }: any) {
       />
       <View style={styles.detailsContainer}>
         <Text style={styles.foodName}>{item.foodName}</Text>
+        {item.donorName ? <Text style={styles.donorName}>{item.donorName}</Text> : null}
         <Text style={styles.addressText}>{item.location}</Text>
         <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
         
@@ -181,6 +182,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
+  },
+  donorName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555',
+    marginTop: 2,
   },
   addressText: {
     fontSize: 13,

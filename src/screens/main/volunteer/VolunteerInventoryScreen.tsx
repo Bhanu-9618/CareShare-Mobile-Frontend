@@ -109,7 +109,10 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
     const renderInventoryItem = ({ item }: { item: Donation }) => (
         <View style={styles.card}>
             <View style={styles.cardHeader}>
-                <Text style={styles.foodName}>{item.foodName}</Text>
+                <View>
+                    <Text style={styles.foodName}>{item.foodName}</Text>
+                    {item.donorName ? <Text style={styles.donorName}>{item.donorName}</Text> : null}
+                </View>
                 <View
                     style={[
                         styles.statusBadge,
@@ -286,6 +289,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333333',
+    },
+    donorName: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#555',
+        marginTop: 2,
     },
     statusBadge: {
         paddingHorizontal: 10,

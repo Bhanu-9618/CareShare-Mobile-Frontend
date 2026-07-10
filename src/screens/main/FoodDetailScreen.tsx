@@ -54,6 +54,8 @@ export default function FoodDetailScreen({ route, navigation }: any) {
 
       <View style={styles.infoContainer}>
         <Text style={styles.foodName}>{donation.foodName}</Text>
+        {donation.donorName ? <Text style={styles.donorName}>{donation.donorName}</Text> : null}
+        {donation.volunteerName ? <Text style={styles.volunteerName}>Accepted By : {donation.volunteerName}</Text> : null}
         <Text style={styles.addressText}>Location: {donation.location}</Text>
 
         <View style={styles.divider} />
@@ -107,8 +109,20 @@ const styles = StyleSheet.create({
   foodName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 4,
+    color: '#333',
+    marginBottom: 5,
+  },
+  donorName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#555',
+    marginBottom: 5,
+  },
+  volunteerName: {
+    fontSize: 15,
+    color: '#0056b3',
+    fontWeight: '500',
+    marginBottom: 5,
   },
   addressText: {
     fontSize: 14,

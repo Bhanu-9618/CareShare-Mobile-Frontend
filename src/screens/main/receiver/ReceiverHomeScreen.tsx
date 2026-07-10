@@ -21,7 +21,10 @@ export default function ReceiverHomeScreen() {
   const renderIncomingCard = ({ item }: { item: Donation }) => (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
-        <Text style={styles.foodName}>{item.foodName}</Text>
+        <View>
+          <Text style={styles.foodName}>{item.foodName}</Text>
+          {item.donorName ? <Text style={styles.donorName}>{item.donorName}</Text> : null}
+        </View>
         <View
           style={[
             styles.statusBadge,
@@ -41,6 +44,7 @@ export default function ReceiverHomeScreen() {
 
       <Text style={styles.addressText}>Location: {item.location}</Text>
       <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
+      {item.volunteerName ? <Text style={styles.volunteerName}>Accepted By : {item.volunteerName}</Text> : null}
 
       {/* Show the secret OTP directly to the receiver */}
       <View style={styles.otpContainer}>
@@ -129,6 +133,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333333',
+  },
+  donorName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555',
+    marginTop: 2,
+  },
+  volunteerName: {
+    fontSize: 13,
+    color: '#0056b3',
+    fontWeight: '500',
+    marginTop: 2,
   },
   statusBadge: {
     paddingHorizontal: 10,

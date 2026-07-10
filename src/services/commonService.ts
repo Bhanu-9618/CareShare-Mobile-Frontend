@@ -12,6 +12,8 @@ export interface Donation {
   imageKey: string;
   imageUrl: string;
   generated_otp?: string;
+  donorName?: string;
+  volunteerName?: string;
 }
 
 export const commonService = {

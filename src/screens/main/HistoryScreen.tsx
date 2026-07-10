@@ -42,7 +42,9 @@ export default function HistoryScreen() {
       />
       <View style={styles.detailsContainer}>
         <Text style={styles.foodName}>{item.foodName}</Text>
-        <Text style={styles.addressText}>{item.location}</Text>
+        {item.donorName ? <Text style={styles.donorName}>{item.donorName}</Text> : null}
+        {item.volunteerName ? <Text style={styles.volunteerName}>Accepted By : {item.volunteerName}</Text> : null}
+        <Text style={styles.locationText}>{item.location}</Text>
         <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
         <View style={styles.expiryRow}>
           <Text style={styles.expiry}>Expires: {getExpiryText(item.expiryAt)}</Text>
@@ -131,6 +133,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
+  },
+  donorName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555',
+    marginTop: 2,
+  },
+  volunteerName: {
+    fontSize: 13,
+    color: '#0056b3',
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  locationText: {
+    fontSize: 13,
+    color: '#666666',
+    marginBottom: 4,
   },
   quantity: {
     fontSize: 13,

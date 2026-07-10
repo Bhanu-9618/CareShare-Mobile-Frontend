@@ -54,9 +54,11 @@ export default function ReceiverLiveFeedScreen() {
   const renderLiveItem = ({ item }: { item: Donation }) => (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
-        <View style={{ flex: 1 }}>
+        <View style={styles.detailsContainer}>
           <Text style={styles.foodName}>{item.foodName}</Text>
-          <Text style={styles.addressText}>Location: {item.location}</Text>
+          {item.donorName ? <Text style={styles.donorName}>{item.donorName}</Text> : null}
+          <Text style={styles.quantityText}>Quantity: {item.quantity}</Text>
+          {item.volunteerName ? <Text style={styles.volunteerName}>Accepted By : {item.volunteerName}</Text> : null}
         </View>
         <View style={styles.liveBadge}>
           <Text style={styles.liveText}>{item.status}</Text>
@@ -157,10 +159,22 @@ const styles = StyleSheet.create({
   foodName: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 2,
+    color: '#333',
+    marginBottom: 4,
   },
-  addressText: {
+  donorName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#555',
+    marginBottom: 4,
+  },
+  volunteerName: {
+    fontSize: 13,
+    color: '#0056b3',
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  quantityText: {
     fontSize: 12,
     color: '#888888',
   },
