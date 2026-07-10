@@ -35,20 +35,32 @@ export default function ReceiverLiveFeedScreen() {
       return;
     }
 
-    try {
-      setIsProcessing(item.donationId);
-      const res = await receiverService.requestDonation(item.donationId);
-      Alert.alert(
-        'Request Submitted',
-        res.message || `Your request for "${item.foodName}" has been successfully sent to the volunteer.`,
-        [{ text: 'OK', onPress: () => refetch() }]
-      );
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || 'Failed to request food donation.';
-      Alert.alert('Error', errorMsg);
-    } finally {
-      setIsProcessing(null);
-    }
+    Alert.alert(
+      'Confirm Request',
+      `Are you sure you want to request "${item.foodName}"?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              setIsProcessing(item.donationId);
+              const res = await receiverService.requestDonation(item.donationId);
+              Alert.alert(
+                'Request Submitted',
+                res.message || `Your request for "${item.foodName}" has been successfully sent to the volunteer.`,
+                [{ text: 'OK', onPress: () => refetch() }]
+              );
+            } catch (error: any) {
+              const errorMsg = error.response?.data?.message || 'Failed to request food donation.';
+              Alert.alert('Error', errorMsg);
+            } finally {
+              setIsProcessing(null);
+            }
+          }
+        }
+      ]
+    );
   };
 
   const renderLiveItem = ({ item }: { item: Donation }) => (

@@ -36,37 +36,61 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
     );
 
     const handleConfirmRequest = async (item: Donation) => {
-        try {
-            setIsProcessing(item.donationId);
-            const res = await volunteerService.confirmRequest(item.donationId);
-            Alert.alert(
-                'Request Confirmed',
-                res.message || 'The request was successfully confirmed and OTP has been sent to the receiver!',
-                [{ text: 'OK', onPress: () => refetch() }]
-            );
-        } catch (error: any) {
-            const errorMsg = error.response?.data?.message || 'Failed to confirm the request.';
-            Alert.alert('Error', errorMsg);
-        } finally {
-            setIsProcessing(null);
-        }
+        Alert.alert(
+            'Confirm Request',
+            `Are you sure you want to confirm the request for "${item.foodName}"?`,
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Yes',
+                    onPress: async () => {
+                        try {
+                            setIsProcessing(item.donationId);
+                            const res = await volunteerService.confirmRequest(item.donationId);
+                            Alert.alert(
+                                'Request Confirmed',
+                                res.message || 'The request was successfully confirmed and OTP has been sent to the receiver!',
+                                [{ text: 'OK', onPress: () => refetch() }]
+                            );
+                        } catch (error: any) {
+                            const errorMsg = error.response?.data?.message || 'Failed to confirm the request.';
+                            Alert.alert('Error', errorMsg);
+                        } finally {
+                            setIsProcessing(null);
+                        }
+                    }
+                }
+            ]
+        );
     };
 
     const handleCancelRequest = async (item: Donation) => {
-        try {
-            setIsProcessing(item.donationId);
-            const res = await volunteerService.cancelRequest(item.donationId);
-            Alert.alert(
-                'Request Cancelled',
-                res.message || 'The request was successfully rejected and the donation is back on the Live feed.',
-                [{ text: 'OK', onPress: () => refetch() }]
-            );
-        } catch (error: any) {
-            const errorMsg = error.response?.data?.message || 'Failed to cancel the request.';
-            Alert.alert('Error', errorMsg);
-        } finally {
-            setIsProcessing(null);
-        }
+        Alert.alert(
+            'Cancel Request',
+            `Are you sure you want to cancel the request for "${item.foodName}"?`,
+            [
+                { text: 'No', style: 'cancel' },
+                {
+                    text: 'Yes',
+                    onPress: async () => {
+                        try {
+                            setIsProcessing(item.donationId);
+                            const res = await volunteerService.cancelRequest(item.donationId);
+                            Alert.alert(
+                                'Request Cancelled',
+                                res.message || 'The request was successfully rejected and the donation is back on the Live feed.',
+                                [{ text: 'OK', onPress: () => refetch() }]
+                            );
+                        } catch (error: any) {
+                            const errorMsg = error.response?.data?.message || 'Failed to cancel the request.';
+                            Alert.alert('Error', errorMsg);
+                        } finally {
+                            setIsProcessing(null);
+                        }
+                    }
+                }
+            ]
+        );
     };
 
     const handleDeliveredPress = (item: Donation) => {

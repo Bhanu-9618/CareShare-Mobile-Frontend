@@ -63,18 +63,30 @@ export default function OngoingTaskScreen({ navigation }: any) {
   };
 
   const handleCancel = async (taskId: string) => {
-    try {
-      setIsProcessing(taskId);
-      const res = await volunteerService.unclaimDonation(taskId);
-      Alert.alert('Success', res.message || 'Donation unclaimed successfully!', [
-        { text: 'OK', onPress: () => refetch() }
-      ]);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || 'Failed to cancel donation.';
-      Alert.alert('Error', errorMsg);
-    } finally {
-      setIsProcessing(null);
-    }
+    Alert.alert(
+      'Cancel Task',
+      'Are you sure you want to cancel this delivery task?',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              setIsProcessing(taskId);
+              const res = await volunteerService.unclaimDonation(taskId);
+              Alert.alert('Success', res.message || 'Donation unclaimed successfully!', [
+                { text: 'OK', onPress: () => refetch() }
+              ]);
+            } catch (error: any) {
+              const errorMsg = error.response?.data?.message || 'Failed to cancel donation.';
+              Alert.alert('Error', errorMsg);
+            } finally {
+              setIsProcessing(null);
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
