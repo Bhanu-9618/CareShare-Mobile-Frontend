@@ -6,6 +6,7 @@ import { COLORS } from '../../../constants/colors';
 import { useQuery } from '@tanstack/react-query';
 import { donorService } from '../../../services/donorService';
 import { Donation } from '../../../services/commonService';
+import { getExpiryText, getStatusColor } from '../../../utils/helpers';
 
 export default function DonorHomeScreen() {
   const { user } = useApp();
@@ -22,22 +23,6 @@ export default function DonorHomeScreen() {
   );
 
   const activeDonations = donations.filter((item) => item.status !== 'COMPLETED');
-
-  const getStatusColor = (status: string) => {
-    switch (status?.toUpperCase()) {
-      case 'ACTIVE': return '#007bff';
-      case 'ACCEPTED': return '#ffc107';
-      case 'COMPLETED': return COLORS.primary || 'green';
-      default: return '#6c757d';
-    }
-  };
-
-  const getExpiryText = (epochSeconds: number) => {
-    const diffMs = (epochSeconds * 1000) - Date.now();
-    if (diffMs <= 0) return 'Expired';
-    const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
-    return `In ${diffHours} Hour${diffHours === 1 ? '' : 's'}`;
-  };
 
   const renderFoodCard = ({ item }: { item: Donation }) => (
     <View style={styles.card}>

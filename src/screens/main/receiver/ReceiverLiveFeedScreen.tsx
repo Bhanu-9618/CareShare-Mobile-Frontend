@@ -6,6 +6,7 @@ import { useApp } from '../../../context/AppContext';
 import { receiverService } from '../../../services/receiverService';
 import { Donation } from '../../../services/commonService';
 import { COLORS } from '../../../constants/colors';
+import { getExpiryText } from '../../../utils/helpers';
 
 export default function ReceiverLiveFeedScreen() {
   const { user } = useApp();
@@ -21,13 +22,6 @@ export default function ReceiverLiveFeedScreen() {
       refetch();
     }, [refetch])
   );
-
-  const getExpiryText = (epochSeconds: number) => {
-    const diffMs = (epochSeconds * 1000) - Date.now();
-    if (diffMs <= 0) return 'Expired';
-    const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
-    return `In ${diffHours} Hour${diffHours === 1 ? '' : 's'}`;
-  };
 
   const handleRequestFood = async (item: Donation) => {
     if (!user) {

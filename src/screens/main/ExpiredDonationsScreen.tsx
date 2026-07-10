@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
 import { useQuery } from '@tanstack/react-query';
 import { commonService, Donation } from '../../services/commonService';
+import { getExpiryText, getStatusColor } from '../../utils/helpers';
 
 export default function ExpiredDonationsScreen() {
   const { data: expiredLogs = [], isLoading, isError, refetch } = useQuery({
@@ -16,23 +17,6 @@ export default function ExpiredDonationsScreen() {
       refetch();
     }, [refetch])
   );
-
-  const getStatusColor = (status: string) => {
-    switch (status?.toUpperCase()) {
-      case 'ACTIVE': return '#007bff';
-      case 'ACCEPTED': return '#ffc107';
-      case 'COMPLETED': return COLORS.primary || 'green';
-      case 'EXPIRED': return '#dc3545';
-      default: return '#6c757d';
-    }
-  };
-
-  const getExpiryText = (epochSeconds: number) => {
-    const diffMs = (epochSeconds * 1000) - Date.now();
-    if (diffMs <= 0) return 'Expired';
-    const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
-    return `In ${diffHours} Hour${diffHours === 1 ? '' : 's'}`;
-  };
 
   const renderHistoryCard = ({ item }: { item: Donation }) => (
     <View style={styles.card}>

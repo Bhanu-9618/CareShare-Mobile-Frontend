@@ -5,18 +5,9 @@ import { useQuery } from '@tanstack/react-query';
 import { volunteerService } from '../../../services/volunteerService';
 import { Donation } from '../../../services/commonService';
 import { COLORS } from '../../../constants/colors';
+import { formatReceiverAddress } from '../../../utils/helpers';
 
 const { width } = Dimensions.get('window');
-
-const formatReceiverAddress = (addressStr?: string) => {
-    if (!addressStr) return '';
-    try {
-        const parsed = JSON.parse(addressStr);
-        return parsed.formatted || addressStr;
-    } catch {
-        return addressStr;
-    }
-};
 
 export default function VolunteerInventoryScreen({ navigation }: any) {
     const [otpModalVisible, setOtpModalVisible] = useState(false);

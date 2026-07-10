@@ -4,6 +4,7 @@ import CustomButton from '../../components/CustomButton';
 import { Donation } from '../../services/commonService';
 import { volunteerService } from '../../services/volunteerService';
 import { COLORS } from '../../constants/colors';
+import { getExpiryText } from '../../utils/helpers';
 
 export default function FoodDetailScreen({ route, navigation }: any) {
   const [isClaiming, setIsClaiming] = useState(false);
@@ -16,14 +17,6 @@ export default function FoodDetailScreen({ route, navigation }: any) {
       </View>
     );
   }
-
-  const getExpiryText = (epochSeconds: number) => {
-    const diffMs = (epochSeconds * 1000) - Date.now();
-    if (diffMs <= 0) return 'Expired';
-    const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
-    return `In ${diffHours} Hour${diffHours === 1 ? '' : 's'}`;
-  };
-
   const handleClaimDonation = async () => {
     try {
       setIsClaiming(true);
