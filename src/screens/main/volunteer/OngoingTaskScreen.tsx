@@ -6,8 +6,12 @@ import CustomButton from '../../../components/CustomButton';
 import { volunteerService } from '../../../services/volunteerService';
 import { Donation } from '../../../services/commonService';
 import { COLORS } from '../../../constants/colors';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { RootTabParamList } from '../../../types/navigation';
 
-export default function OngoingTaskScreen({ navigation }: any) {
+type Props = BottomTabScreenProps<RootTabParamList, 'My Task'>;
+
+export default function OngoingTaskScreen({ navigation }: Props) {
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const { data: ongoingTasks = [], isLoading, isError, refetch } = useQuery({
@@ -54,8 +58,9 @@ export default function OngoingTaskScreen({ navigation }: any) {
       Alert.alert('Success', res.message || 'Donation picked up successfully!', [
         { text: 'OK', onPress: () => refetch() }
       ]);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || 'Failed to pick up donation.';
+    } catch (error: unknown) {
+      const err = error as any;
+      const errorMsg = err.response?.data?.message || 'Failed to pick up donation.';
       Alert.alert('Error', errorMsg);
     } finally {
       setIsProcessing(null);
@@ -77,8 +82,9 @@ export default function OngoingTaskScreen({ navigation }: any) {
               Alert.alert('Success', res.message || 'Donation unclaimed successfully!', [
                 { text: 'OK', onPress: () => refetch() }
               ]);
-            } catch (error: any) {
-              const errorMsg = error.response?.data?.message || 'Failed to cancel donation.';
+            } catch (error: unknown) {
+              const err = error as any;
+              const errorMsg = err.response?.data?.message || 'Failed to cancel donation.';
               Alert.alert('Error', errorMsg);
             } finally {
               setIsProcessing(null);

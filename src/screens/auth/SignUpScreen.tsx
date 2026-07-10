@@ -5,14 +5,18 @@ import CustomInput from '../../components/CustomInput';
 import { COLORS } from '../../constants/colors';
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '../../services/authService';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../../types/navigation';
 
-export default function SignUpScreen({ navigation }: any) {
+type Props = StackScreenProps<RootStackParamList, 'SignUp'>;
+
+export default function SignUpScreen({ navigation }: Props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [address, setAddress] = useState('');
   const [role, setRole] = useState<'Donor' | 'Volunteer' | 'Receiver'>('Donor');
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const roles: ('Donor' | 'Volunteer' | 'Receiver')[] = ['Donor', 'Volunteer', 'Receiver'];
 
@@ -22,9 +26,10 @@ export default function SignUpScreen({ navigation }: any) {
 
       navigation.navigate('VerifyAccount', { email });
     },
-    onError: (error: any, variables: any) => {
+    onError: (error: unknown, variables: any) => {
 
-      const errorMessage = error.response?.data?.message || error.response?.data?.error || 'Registration Failed';
+      const err = error as any;
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || 'Registration Failed';
 
       if (errorMessage.toLowerCase().includes('already exist') || errorMessage.toLowerCase().includes('registered successfully')) {
         Alert.alert('Email already exists!', 'Please verify your account or login.', [
@@ -39,7 +44,7 @@ export default function SignUpScreen({ navigation }: any) {
 
   const handleSignUp = () => {
     let valid = true;
-    let localErrors: any = {};
+    let localErrors: Record<string, string> = {};
 
     if (!name.trim()) {
       localErrors.name = 'Name is required';

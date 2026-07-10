@@ -45,8 +45,9 @@ export default function ReceiverLiveFeedScreen() {
                 res.message || `Your request for "${item.foodName}" has been successfully sent to the volunteer.`,
                 [{ text: 'OK', onPress: () => refetch() }]
               );
-            } catch (error: any) {
-              const errorMsg = error.response?.data?.message || 'Failed to request food donation.';
+            } catch (error: unknown) {
+              const err = error as any;
+              const errorMsg = err.response?.data?.message || 'Failed to request food donation.';
               Alert.alert('Error', errorMsg);
             } finally {
               setIsProcessing(null);

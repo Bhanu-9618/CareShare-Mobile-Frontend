@@ -7,8 +7,17 @@ import { COLORS } from '../../../constants/colors';
 import { volunteerService } from '../../../services/volunteerService';
 import { Donation } from '../../../services/commonService';
 import { getExpiryText, getStatusColor } from '../../../utils/helpers';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { StackScreenProps } from '@react-navigation/stack';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { RootTabParamList, RootStackParamList } from '../../../types/navigation';
 
-export default function VolunteerFeedScreen({ navigation }: any) {
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<RootTabParamList, 'Available Food'>,
+  StackScreenProps<RootStackParamList>
+>;
+
+export default function VolunteerFeedScreen({ navigation }: Props) {
   const { user } = useApp();
 
   const { data: feedData = [], isLoading, isError, refetch } = useQuery({

@@ -8,8 +8,12 @@ import { COLORS } from '../../../constants/colors';
 import { formatReceiverAddress } from '../../../utils/helpers';
 
 const { width } = Dimensions.get('window');
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { RootTabParamList } from '../../../types/navigation';
 
-export default function VolunteerInventoryScreen({ navigation }: any) {
+type Props = BottomTabScreenProps<RootTabParamList, 'My Inventory'>;
+
+export default function VolunteerInventoryScreen({ navigation }: Props) {
     const [otpModalVisible, setOtpModalVisible] = useState(false);
     const [otpInput, setOtpInput] = useState('');
     const [selectedItem, setSelectedItem] = useState<Donation | null>(null);
@@ -43,8 +47,9 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
                                 res.message || 'The request was successfully confirmed and OTP has been sent to the receiver!',
                                 [{ text: 'OK', onPress: () => refetch() }]
                             );
-                        } catch (error: any) {
-                            const errorMsg = error.response?.data?.message || 'Failed to confirm the request.';
+                        } catch (error: unknown) {
+                            const err = error as any;
+                            const errorMsg = err.response?.data?.message || 'Failed to confirm the request.';
                             Alert.alert('Error', errorMsg);
                         } finally {
                             setIsProcessing(null);
@@ -72,8 +77,9 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
                                 res.message || 'The request was successfully rejected and the donation is back on the Live feed.',
                                 [{ text: 'OK', onPress: () => refetch() }]
                             );
-                        } catch (error: any) {
-                            const errorMsg = error.response?.data?.message || 'Failed to cancel the request.';
+                        } catch (error: unknown) {
+                            const err = error as any;
+                            const errorMsg = err.response?.data?.message || 'Failed to cancel the request.';
                             Alert.alert('Error', errorMsg);
                         } finally {
                             setIsProcessing(null);
@@ -106,8 +112,9 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
             Alert.alert('✅ Delivery Successful', res.message || 'OTP verified! Food has been delivered successfully.', [
                 { text: 'OK', onPress: () => refetch() }
             ]);
-        } catch (error: any) {
-            const errorMsg = error.response?.data?.error || error.response?.data?.message || 'Invalid OTP. Please check with the receiver and try again.';
+        } catch (error: unknown) {
+            const err = error as any;
+            const errorMsg = err.response?.data?.error || err.response?.data?.message || 'Invalid OTP. Please check with the receiver and try again.';
             Alert.alert('❌ Verification Failed', errorMsg);
         } finally {
             setIsProcessing(null);

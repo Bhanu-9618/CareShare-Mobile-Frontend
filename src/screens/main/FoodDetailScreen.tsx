@@ -5,8 +5,12 @@ import { Donation } from '../../services/commonService';
 import { volunteerService } from '../../services/volunteerService';
 import { COLORS } from '../../constants/colors';
 import { getExpiryText } from '../../utils/helpers';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../../types/navigation';
 
-export default function FoodDetailScreen({ route, navigation }: any) {
+type Props = StackScreenProps<RootStackParamList, 'FoodDetail'>;
+
+export default function FoodDetailScreen({ route, navigation }: Props) {
   const [isClaiming, setIsClaiming] = useState(false);
   const donation: Donation = route.params?.donation;
 
@@ -30,8 +34,9 @@ export default function FoodDetailScreen({ route, navigation }: any) {
           },
         },
       ]);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || 'Failed to claim donation.';
+    } catch (error: unknown) {
+      const err = error as any;
+      const errorMsg = err.response?.data?.message || 'Failed to claim donation.';
       Alert.alert('Error', errorMsg);
     } finally {
       setIsClaiming(false);

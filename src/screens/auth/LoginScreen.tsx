@@ -7,8 +7,12 @@ import { COLORS } from '../../constants/colors';
 import { useMutation } from '@tanstack/react-query';
 import { authService } from '../../services/authService';
 import { decodeJwt } from '../../utils/jwtUtils';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../../types/navigation';
 
-export default function LoginScreen({ navigation }: any) {
+type Props = StackScreenProps<RootStackParamList, 'Login'>;
+
+export default function LoginScreen({ navigation }: Props) {
   const { login } = useApp();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,9 +48,10 @@ export default function LoginScreen({ navigation }: any) {
       });
 
     },
-    onError: (error: any) => {
-      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Login Failed';
-      if (error.response?.status === 401 || errorMessage.toLowerCase().includes('invalid')) {
+    onError: (error: unknown) => {
+      const err = error as any;
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Login Failed';
+      if (err.response?.status === 401 || errorMessage.toLowerCase().includes('invalid')) {
         Alert.alert('Invalid credentials', 'Please check your details or register.');
       } else {
         Alert.alert('Login Failed', errorMessage);

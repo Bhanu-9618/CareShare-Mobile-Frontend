@@ -2,6 +2,7 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useApp } from '../context/AppContext';
+import { RootStackParamList, RootTabParamList } from '../types/navigation';
 
 import LoginScreen from '../screens/auth/LoginScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
@@ -21,8 +22,8 @@ import AdvancedVerificationScreen from '../screens/main/AdvancedVerificationScre
 import ProfileScreen from '../screens/main/ProfileScreen';
 import ExpiredDonationsScreen from '../screens/main/ExpiredDonationsScreen';
 
-const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<RootTabParamList>();
 
 function DonorTabs() {
   return (

@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, Alert } from 'react-native';
 import { useApp } from '../../context/AppContext';
 import CustomButton from '../../components/CustomButton';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from '../../types/navigation';
 
-export default function VerificationScreen({ route, navigation }: any) {
-  const { foodId } = route.params;
-  const { updateFoodStatus } = useApp();
+type Props = StackScreenProps<RootStackParamList, 'Verification'>;
+
+export default function VerificationScreen({ route, navigation }: Props) {
+  const { foodId } = route.params as any;
+  const { updateFoodStatus } = useApp() as any;
   const [otp, setOtp] = useState(['', '', '', '']);
 
   const handleOtpChange = (value: string, index: number) => {

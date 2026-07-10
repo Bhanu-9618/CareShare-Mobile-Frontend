@@ -6,8 +6,12 @@ import CustomInput from '../../../components/CustomInput';
 import CustomButton from '../../../components/CustomButton';
 import { commonService } from '../../../services/commonService';
 import { donorService } from '../../../services/donorService';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { RootTabParamList } from '../../../types/navigation';
 
-export default function AddFoodScreen({ _navigation }: any) {
+type Props = BottomTabScreenProps<RootTabParamList, 'Post Food'>;
+
+export default function AddFoodScreen({ navigation }: Props) {
   const { user } = useApp();
 
   const [foodName, setFoodName] = useState('');
@@ -15,7 +19,7 @@ export default function AddFoodScreen({ _navigation }: any) {
   const [expiryTime, setExpiryTime] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [errors, setErrors] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleSelectImage = () => {
     Alert.alert(
@@ -41,7 +45,7 @@ export default function AddFoodScreen({ _navigation }: any) {
 
   const handlePostDonation = async () => {
     let valid = true;
-    let localErrors: any = {};
+    let localErrors: Record<string, string> = {};
 
     if (!foodName.trim()) {
       localErrors.foodName = 'Food name is required';
@@ -72,8 +76,8 @@ export default function AddFoodScreen({ _navigation }: any) {
       setIsUploading(true);
       try {
         const filename = imageUri.split('/').pop() || 'image.jpg';
-        const uploadResponse: any = await commonService.getUploadUrl(filename);
-        const uploadUrl = uploadResponse.uploadUrl || uploadResponse;
+        const uploadResponse: { uploadUrl?: string, imageKey?: string } = await commonService.getUploadUrl(filename);
+        const uploadUrl = uploadResponse.uploadUrl || (uploadResponse as unknown as string);
         const imageKey = uploadResponse.imageKey || filename;
 
         const imageResponse = await fetch(imageUri);
@@ -108,7 +112,7 @@ export default function AddFoodScreen({ _navigation }: any) {
         setImageUri(null);
         setErrors({});
         
-      } catch (error: any) {
+      } catch (error: unknown) {
         Alert.alert('Error', 'Failed to post donation. Please try again.');
       } finally {
         setIsUploading(false);
