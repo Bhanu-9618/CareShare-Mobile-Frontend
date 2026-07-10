@@ -9,6 +9,7 @@ import { authService } from '../../services/authService';
 import { decodeJwt } from '../../utils/jwtUtils';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types/navigation';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type Props = StackScreenProps<RootStackParamList, 'Login'>;
 
@@ -69,6 +70,9 @@ export default function LoginScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
+      <View style={styles.iconContainer}>
+        <Ionicons name="fast-food" size={80} color={COLORS.primary} />
+      </View>
       <Text style={styles.logo}>CareShare</Text>
       <Text style={styles.subtitle}>Welcome back! Please login to your account.</Text>
 
@@ -112,8 +116,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    padding: 30,
     backgroundColor: '#ffffff',
-    padding: 25,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
   },
   logo: {
     fontSize: 36,
