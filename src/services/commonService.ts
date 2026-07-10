@@ -14,6 +14,8 @@ export interface Donation {
   generated_otp?: string;
   donorName?: string;
   volunteerName?: string;
+  receiverName?: string;
+  receiverAddress?: string;
 }
 
 export const commonService = {
