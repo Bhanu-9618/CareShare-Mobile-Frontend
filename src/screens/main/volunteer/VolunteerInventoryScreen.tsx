@@ -1,10 +1,22 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, TextInput, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, TextInput, Modal, ActivityIndicator, Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useQuery } from '@tanstack/react-query';
 import { volunteerService } from '../../../services/volunteerService';
 import { Donation } from '../../../services/commonService';
 import { COLORS } from '../../../constants/colors';
+
+const { width } = Dimensions.get('window');
+
+const formatReceiverAddress = (addressStr?: string) => {
+    if (!addressStr) return '';
+    try {
+        const parsed = JSON.parse(addressStr);
+        return parsed.formatted || addressStr;
+    } catch {
+        return addressStr;
+    }
+};
 
 export default function VolunteerInventoryScreen({ navigation }: any) {
     const [otpModalVisible, setOtpModalVisible] = useState(false);
@@ -109,7 +121,10 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
     const renderInventoryItem = ({ item }: { item: Donation }) => (
         <View style={styles.card}>
             <View style={styles.cardHeader}>
-                <Text style={styles.foodName}>{item.foodName}</Text>
+                <View>
+                    <Text style={styles.foodName}>{item.foodName}</Text>
+                    {item.donorName ? <Text style={styles.donorName}>{item.donorName}</Text> : null}
+                </View>
                 <View
                     style={[
                         styles.statusBadge,
@@ -126,12 +141,17 @@ export default function VolunteerInventoryScreen({ navigation }: any) {
                     </Text>
                 </View>
             </View>
-
-            <View style={styles.locationContainer}>
-                <Text style={styles.locationLabel}>Pickup Location:</Text>
-                <Text style={styles.locationText}>{item.location}</Text>
-            </View>
             <Text style={styles.detailText}>📦 Quantity: {item.quantity}</Text>
+
+            {item.receiverName && (
+                <View style={styles.receiverContainer}>
+                    <Text style={styles.receiverLabel}>Drop-off Location:</Text>
+                    <Text style={styles.receiverName}>{item.receiverName}</Text>
+                    {item.receiverAddress && (
+                        <Text style={styles.receiverAddress}>{formatReceiverAddress(item.receiverAddress)}</Text>
+                    )}
+                </View>
+            )}
 
             {item.status === 'REQUESTED' && !item.generated_otp && (
                 <View style={styles.actionRow}>
@@ -287,6 +307,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#333333',
     },
+    donorName: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#555',
+        marginTop: 2,
+    },
     statusBadge: {
         paddingHorizontal: 10,
         paddingVertical: 4,
@@ -303,30 +329,38 @@ const styles = StyleSheet.create({
         marginTop: 8,
         marginBottom: 4,
     },
+    receiverContainer: {
+        backgroundColor: '#fdf3e7',
+        padding: 12,
+        borderRadius: 8,
+        marginBottom: 15,
+        borderLeftWidth: 4,
+        borderLeftColor: '#f39c12',
+        marginTop: 5,
+    },
+    receiverLabel: {
+        fontSize: 12,
+        color: '#888',
+        fontWeight: '600',
+        marginBottom: 2,
+        textTransform: 'uppercase',
+    },
+    receiverName: {
+        fontSize: 14,
+        color: '#333',
+        fontWeight: 'bold',
+        marginBottom: 2,
+    },
+    receiverAddress: {
+        fontSize: 13,
+        color: '#666',
+        marginTop: 2,
+    },
     infoText: {
         fontSize: 12,
         color: '#666666',
         fontStyle: 'italic',
         marginTop: 10,
-    },
-    locationContainer: {
-        backgroundColor: '#eef2f7',
-        padding: 10,
-        borderRadius: 8,
-        marginTop: 5,
-        borderLeftWidth: 4,
-        borderLeftColor: '#007bff'
-    },
-    locationLabel: {
-        fontSize: 11,
-        color: '#666',
-        fontWeight: '600',
-        marginBottom: 2,
-    },
-    locationText: {
-        fontSize: 14,
-        color: '#1a1a1a',
-        fontWeight: 'bold',
     },
     actionRow: {
         flexDirection: 'row',
