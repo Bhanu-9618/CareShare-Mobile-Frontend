@@ -1,97 +1,40 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# CareShare - Frontend Architecture
 
-# Getting Started
+CareShare is a full-stack, strictly typed mobile application designed to bridge the gap between food surplus and food scarcity. It operates as a real-time logistics and donation platform connecting Donors, Volunteers, and Receivers. The platform facilitates the seamless posting, tracking, and secure handover of food donations.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## 🛠 Tech Stack & Architecture
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+* **Framework:** React Native (Bare CLI)
+* **Language:** TypeScript (100% Strict Mode, zero `: any` types)
+* **Navigation:** React Navigation v6 with fully typed route parameters
+* **State Management:** React Query for server state and Context API for global client state
+* **Networking:** Axios with centralized interceptors and strict error typing
+* **Styling & UI:** React Native StyleSheet with custom Native App Icons and vector icons
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+---
 
-```sh
-# Using npm
-npm start
+## 🚀 Engineering Highlights
 
-# OR using Yarn
-yarn start
-```
+* **Strict Type Safety:** The entire application enforces strict TypeScript rules, keeping UI components screen-specific to ensure pixel-perfect adjustments without breaking other screens.
+* **Role-Based Access Control (RBAC):** The app decodes secure JWT tokens upon login to instantly determine the user's role and dynamically injects an entirely different navigation flow (Donor, Volunteer, or Receiver tabs).
+* **Advanced Error Handling:** Implemented safe `try/catch` patterns utilizing `error: unknown` with proper type narrowing and casting for stable parsing of HTTP error responses.
+* **Optimized Caching:** Leveraging React Query and `useFocusEffect`, the app minimizes redundant network requests and guarantees instant data freshness when navigating between dashboards.
+* **Clean Code Architecture:** API calls are abstracted into dedicated service files, and complex utility logic is centralized, keeping React components focused purely on rendering UI.
+* **Secure Handover Protocol:** The system utilizes a cryptographic OTP flow where the volunteer must physically input a secret code provided by the receiver to complete the transaction.
 
-## Step 2: Build and run your app
+---
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## 🔄 The Complete Project Flow
 
-### Android
+The application handles a real-time lifecycle for every donation:
 
-```sh
-# Using npm
-npm run android
+### 1. The Donor Flow (Initiation)
+Donors fill out a form detailing the food type, quantity, location, and expiry time. Once posted, the food status becomes `ACTIVE` and is instantly pushed to the Volunteer Feed.
 
-# OR using Yarn
-yarn android
-```
+### 2. The Volunteer Flow (Transit)
+Volunteers view an actively updating feed and can accept `ACTIVE` donations, upgrading the status to `LIVE` (in transit). They manage their deliveries in an ongoing tasks screen and can safely unclaim items in emergencies.
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+### 3. The Receiver Flow (Fulfillment)
+Receivers monitor `LIVE` items and request specific deliveries. They are issued a Secure Delivery OTP. The transaction is only marked as `COMPLETED` when the volunteer arrives and correctly enters the receiver's OTP into the verification screen.
