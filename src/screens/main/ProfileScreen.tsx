@@ -96,16 +96,16 @@ export default function ProfileScreen() {
         <Text style={styles.readOnlyValue}>{user?.email || ''}</Text>
 
         <CustomInput
-          label="Full Name"
-          placeholder="Update your name"
+          label="Full Name / Organization Name"
+          placeholder="Input your/organization name"
           value={name}
           onChangeText={setName}
           error={errors.name}
         />
 
         <CustomInput
-          label="Address"
-          placeholder="Update your address"
+          label="Location / Address"
+          placeholder="Input your/organization address"
           value={address}
           onChangeText={setAddress}
           error={errors.address}
