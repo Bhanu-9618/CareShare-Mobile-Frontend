@@ -86,8 +86,8 @@ export default function SignUpScreen({ navigation }: Props) {
       <Text style={styles.subtitle}>Join us and help reduce food waste today.</Text>
 
       <CustomInput
-        label="Full Name"
-        placeholder="John Doe"
+        label="Full Name / Organization Name"
+        placeholder="Input your/organization name"
         value={name}
         onChangeText={setName}
         error={errors.name}
@@ -112,8 +112,8 @@ export default function SignUpScreen({ navigation }: Props) {
       />
 
       <CustomInput
-        label="Address"
-        placeholder="123 Main St, City"
+        label="Location / Address"
+        placeholder="Input your/organization address"
         value={address}
         onChangeText={setAddress}
         error={errors.address}
